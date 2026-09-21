@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Verifikasi OTP')
+@section('title', 'Verifikasi OTP - CIO Saham')
 
 @push('css')
 <style>

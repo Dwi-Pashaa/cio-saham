@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Buat Password Baru')
+@section('title', 'Buat Password Baru - CIO Saham')
 
 @section('content')
     <div class="text-center mb-4">

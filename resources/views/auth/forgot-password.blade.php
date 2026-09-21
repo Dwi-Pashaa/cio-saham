@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Lupa Password')
+@section('title', 'Lupa Password - CIO Saham')
 
 @section('content')
     <div class="text-center mb-4">
@@ -9,7 +9,7 @@
         </div>
         <h2 class="card-title fw-bold">Atur Ulang Password</h2>
         <p class="card-subtitle text-muted">
-            Masukkan Username atau Email Anda. Kami akan mengirimkan kode verifikasi OTP ke kontak terdaftar Anda.
+            Masukkan Username atau Email akun <strong>CIO Saham</strong> Anda. Kode verifikasi OTP akan dikirimkan untuk mengatur ulang kata sandi.
         </p>
     </div>
 

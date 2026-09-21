@@ -1,11 +1,11 @@
 @extends('layouts.auth')
 
-@section('title', 'Login Portal')
+@section('title', 'Login CIO Saham')
 
 @section('content')
     <div class="text-center mb-4">
-        <h2 class="card-title">Masuk ke Akun Anda</h2>
-        <p class="card-subtitle">Silakan masukkan kredensial akun untuk mengakses sistem CIO Investor</p>
+        <h2 class="card-title fw-bold">Masuk ke Akun Anda</h2>
+        <p class="card-subtitle text-muted">Silakan masukkan username dan password untuk mengakses portal <strong>CIO Saham</strong></p>
     </div>
 
     <form action="{{route('post.login')}}" method="POST" autocomplete="off" novalidate id="form-login">

@@ -19,10 +19,14 @@
 <body>
     <div class="auth-page-wrapper">
         <div class="auth-card">
-            <div class="auth-logo-wrap">
-                <a href="{{route('login')}}">
-                    <img src="{{asset('img/logo.jpg')}}" alt="{{ config('app.name') }}" style="border-radius: 8px;" />
+            <div class="auth-logo-wrap text-center mb-3">
+                <a href="{{route('login')}}" class="d-inline-block text-decoration-none">
+                    <img src="{{asset('img/logo.jpg')}}" alt="CIO Saham" style="border-radius: 10px; max-height: 52px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);" />
                 </a>
+                <div class="mt-2">
+                    <h3 class="fw-bold text-primary mb-0" style="letter-spacing: -0.02em; font-size: 1.35rem;">CIO SAHAM</h3>
+                    <div class="text-muted text-uppercase fw-semibold" style="font-size: 10.5px; letter-spacing: 0.08em;">Portal Investasi & Pemegang Saham</div>
+                </div>
             </div>
 
             @if (session()->has('success'))
