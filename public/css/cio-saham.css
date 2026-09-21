@@ -1,0 +1,2086 @@
+/**
+ * CIO SAHAM - ENTERPRISE PROFESSIONAL BLUE & WHITE DESIGN SYSTEM
+ * Sistem Ekuitas Saham & Terminal Pertumbuhan Usaha (Corporate Royal Blue & Crisp White Theme)
+ * Highly Responsive across Mobile, Tablet, and Desktop Breakpoints
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+/* ==========================================================================
+   1. Design Tokens: Corporate Blue & White Palette
+   ========================================================================== */
+:root {
+    /* Primary Corporate Blues */
+    --saham-primary: #0a2540; /* Corporate Midnight Slate/Navy */
+    --saham-blue-dark: #0f2942; /* Dark Navy Deep */
+    --saham-blue-royal: #1e40af; /* Royal Navy Blue (Primary Accent) */
+    --saham-blue-vibrant: #2563eb; /* Vivid Corporate Blue */
+    --saham-blue-bright: #3b82f6; /* Sapphire Blue */
+    --saham-blue-sky: #60a5fa; /* Light Sky Blue */
+    --saham-blue-ice: #eff6ff; /* Ice Blue Subtle 50 */
+    --saham-blue-soft: #f0f7ff; /* Ultra-light Blue Tint */
+    --saham-accent: #2563eb;
+    --saham-accent-hover: #1d4ed8;
+    --saham-accent-subtle: #eff6ff;
+    --saham-accent-border: #bfdbfe;
+
+    /* Surfaces & Backgrounds */
+    --saham-white: #ffffff; /* Pure Crisp White */
+    --saham-bg-page: #f8fafc; /* Modern Slate Light Background */
+    --saham-surface-card: #ffffff; /* Crisp White Card Surface */
+    --saham-surface-subtle: #f8faff; /* Soft Ice-Tinted Surface */
+    --saham-surface-muted: #f1f5f9; /* Muted Slate Surface */
+
+    /* Borders & Dividers */
+    --saham-border: #e2e8f0; /* Subtle Slate Border */
+    --saham-border-blue: #dbeafe; /* Delicate Blue Border */
+    --saham-border-strong: #bfdbfe; /* Focused / Accent Blue Border */
+    --saham-border-subtle: #f1f5f9; /* Divider Border */
+
+    /* Text & Typography */
+    --saham-text-main: #0b192c; /* High-contrast Corporate Navy */
+    --saham-text-body: #1e293b; /* Slate 800 */
+    --saham-text-secondary: #475569; /* Slate 600 */
+    --saham-text-muted: #64748b; /* Slate 500 */
+    --saham-text-blue: #1e40af; /* Royal Blue Highlight */
+    --font-main:
+        "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont,
+        sans-serif;
+    --font-mono:
+        "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        monospace;
+
+    /* Semantic Financial Indicators (Refined for Blue & White Harmony) */
+    --saham-bullish: #059669; /* Emerald Inflow/Surplus */
+    --saham-bullish-bg: #ecfdf5; /* Mint Tint */
+    --saham-bullish-border: #a7f3d0; /* Mint Border */
+    --saham-bearish: #dc2626; /* Crimson Outflow/Defisit */
+    --saham-bearish-bg: #fef2f2; /* Rose Tint */
+    --saham-bearish-border: #fecaca; /* Rose Border */
+    --saham-steady: #0284c7; /* Sky Blue Steady */
+    --saham-steady-bg: #f0f9ff; /* Sky Tint */
+    --saham-steady-border: #bae6fd; /* Sky Border */
+    --saham-warning: #d97706; /* Amber Warning */
+    --saham-warning-bg: #fffbeb; /* Amber Tint */
+    --saham-warning-border: #fde68a; /* Amber Border */
+
+    /* Gradients */
+    --saham-royal-gradient: linear-gradient(
+        135deg,
+        #1e40af 0%,
+        #2563eb 50%,
+        #3b82f6 100%
+    );
+    --saham-banner-gradient: linear-gradient(
+        135deg,
+        #ffffff 0%,
+        #f4f8ff 55%,
+        #eaf2fd 100%
+    );
+    --saham-accent-bar-gradient: linear-gradient(
+        180deg,
+        #1e40af 0%,
+        #38bdf8 100%
+    );
+
+    /* Radius */
+    --saham-radius-sm: 8px;
+    --saham-radius: 12px;
+    --saham-radius-lg: 16px;
+    --saham-radius-pill: 9999px;
+
+    /* Elevation Shadows (Blue-Tinted Premium Shadows) */
+    --saham-shadow-sm:
+        0 1px 3px 0 rgba(10, 37, 64, 0.05),
+        0 1px 2px -1px rgba(10, 37, 64, 0.04);
+    --saham-shadow-md:
+        0 4px 14px -2px rgba(10, 37, 64, 0.07),
+        0 2px 6px -1px rgba(37, 99, 235, 0.04);
+    --saham-shadow-lg:
+        0 12px 28px -4px rgba(10, 37, 64, 0.09),
+        0 6px 12px -3px rgba(37, 99, 235, 0.05);
+    --saham-shadow-glow: 0 0 20px rgba(37, 99, 235, 0.15);
+}
+
+/* ==========================================================================
+   2. Global Typography, Reset & Page Layout
+   ========================================================================== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    font-family: var(--font-main) !important;
+    background-color: var(--saham-bg-page) !important;
+    color: var(--saham-text-body) !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
+    overflow-x: hidden;
+}
+
+.page {
+    background-color: var(--saham-bg-page) !important;
+    color: var(--saham-text-body) !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-wrapper {
+    flex: 1 1 auto;
+}
+
+.font-monospace {
+    font-family: var(--font-mono) !important;
+}
+
+/* Page Header Titles & Pretitles */
+.page-header {
+    padding-top: 1.25rem !important;
+    padding-bottom: 1.25rem !important;
+}
+
+.page-pretitle {
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    color: var(--saham-blue-royal) !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.page-title {
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    color: var(--saham-text-main) !important;
+    letter-spacing: -0.025em !important;
+    line-height: 1.2 !important;
+}
+
+/* ==========================================================================
+   3. Enterprise Top Header & Brand Identity (Corporate White & Royal Blue)
+   ========================================================================== */
+.enterprise-top-header {
+    background: var(--saham-white) !important;
+    border-bottom: 1px solid var(--saham-border) !important;
+    box-shadow: 0 1px 3px 0 rgba(10, 37, 64, 0.03) !important;
+    padding: 0.65rem 0 !important;
+    position: relative;
+    z-index: 1030;
+}
+
+.enterprise-top-header .container-xl {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+}
+
+.enterprise-brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none !important;
+    transition: transform 0.18s ease;
+    min-width: 0;
+}
+
+.enterprise-brand-link:hover {
+    transform: translateY(-1px);
+}
+
+.brand-logo-frame {
+    height: 40px;
+    width: auto;
+    max-width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--saham-white);
+    padding: 3px 8px;
+    border-radius: var(--saham-radius-sm);
+    border: 1px solid var(--saham-border-blue);
+    box-shadow: 0 1px 3px rgba(10, 37, 64, 0.04);
+    flex-shrink: 0;
+}
+
+.brand-logo-img {
+    height: 28px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.brand-text-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.brand-title-row {
+    line-height: 1.15;
+}
+
+.brand-name-bold {
+    font-family: var(--font-main);
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--saham-text-main);
+    letter-spacing: -0.025em;
+    white-space: nowrap;
+}
+
+.brand-portal-tag {
+    background: var(--saham-blue-ice);
+    color: var(--saham-blue-royal);
+    border: 1px solid var(--saham-border-strong);
+    font-size: 0.625rem;
+    font-weight: 700;
+    padding: 0.12rem 0.45rem;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.brand-tagline {
+    font-size: 0.725rem;
+    font-weight: 600;
+    color: var(--saham-blue-vibrant);
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+/* Status Pill */
+.enterprise-status-pill {
+    background: #f0fdf4 !important;
+    color: #15803d !important;
+    border: 1px solid #bbf7d0 !important;
+    padding: 0.35rem 0.85rem !important;
+    border-radius: var(--saham-radius-pill) !important;
+    font-size: 0.775rem !important;
+    font-weight: 600 !important;
+    letter-spacing: -0.01em;
+    box-shadow: 0 1px 2px rgba(21, 128, 61, 0.05);
+    white-space: nowrap;
+}
+
+.pulse-live-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: pulse-dot-animation 2s infinite cubic-bezier(0.66, 0, 0, 1);
+    flex-shrink: 0;
+}
+
+@keyframes pulse-dot-animation {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+/* User Button & Avatar */
+.enterprise-user-btn {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.65rem !important;
+    padding: 0.35rem 0.65rem !important;
+    border-radius: 10px !important;
+    border: 1px solid transparent !important;
+    transition: all 0.18s ease !important;
+    background: transparent !important;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+
+.enterprise-user-btn:hover,
+.enterprise-user-btn[aria-expanded="true"] {
+    background: var(--saham-blue-soft) !important;
+    border-color: var(--saham-border-blue) !important;
+}
+
+.avatar-ring-wrap {
+    position: relative;
+    border-radius: 50%;
+    padding: 2px;
+    background: var(--saham-royal-gradient);
+    box-shadow: 0 2px 5px rgba(30, 64, 175, 0.2);
+    flex-shrink: 0;
+}
+
+.enterprise-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--saham-blue-royal);
+    color: var(--saham-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    border: 2px solid var(--saham-white);
+}
+
+.user-meta-block {
+    line-height: 1.2;
+}
+
+.user-display-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--saham-text-main);
+    letter-spacing: -0.015em;
+    white-space: nowrap;
+}
+
+.user-display-role {
+    font-size: 0.725rem;
+    color: var(--saham-text-muted);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.dropdown-chevron-icon {
+    color: #94a3b8;
+    transition: transform 0.2s ease;
+}
+
+.enterprise-user-btn[aria-expanded="true"] .dropdown-chevron-icon {
+    transform: rotate(180deg);
+}
+
+.enterprise-user-dropdown {
+    min-width: 240px !important;
+    border-radius: var(--saham-radius) !important;
+    border: 1px solid var(--saham-border-blue) !important;
+    box-shadow: var(--saham-shadow-lg) !important;
+    background: var(--saham-white) !important;
+    padding: 0.5rem !important;
+    z-index: 1050 !important;
+}
+
+.dropdown-item-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.enterprise-mobile-toggler {
+    border: 1px solid var(--saham-border-blue) !important;
+    border-radius: var(--saham-radius-sm) !important;
+    padding: 0.4rem 0.6rem !important;
+    background: var(--saham-white) !important;
+    color: var(--saham-text-main) !important;
+    transition: all 0.15s ease;
+    min-width: 40px;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.enterprise-mobile-toggler:hover,
+.enterprise-mobile-toggler:focus {
+    background: var(--saham-blue-ice) !important;
+    border-color: var(--saham-border-strong) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+}
+
+/* ==========================================================================
+   4. Enterprise Subnav & Navigation Bar (Corporate Blue Pills & Badges)
+   ========================================================================== */
+.enterprise-navbar-wrapper {
+    background: var(--saham-white) !important;
+    border-bottom: 1px solid var(--saham-border) !important;
+    box-shadow: 0 1px 3px 0 rgba(10, 37, 64, 0.02) !important;
+}
+
+.enterprise-subnav {
+    padding: 0.3rem 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.enterprise-nav-list {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-direction: row !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.enterprise-nav-link {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: var(--saham-text-secondary) !important;
+    padding: 0.5rem 0.95rem !important;
+    border-radius: var(--saham-radius-sm) !important;
+    border: 1px solid transparent !important;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    text-decoration: none !important;
+    white-space: nowrap;
+}
+
+.enterprise-nav-link:hover {
+    color: var(--saham-blue-royal) !important;
+    background-color: var(--saham-blue-soft) !important;
+    border-color: var(--saham-border-blue) !important;
+    transform: translateY(-1px);
+}
+
+.nav-item.active > .enterprise-nav-link,
+.enterprise-nav-link.active {
+    color: var(--saham-blue-royal) !important;
+    background-color: var(--saham-blue-ice) !important;
+    border-color: var(--saham-border-strong) !important;
+    font-weight: 600 !important;
+    box-shadow: 0 1px 3px 0 rgba(37, 99, 235, 0.08) !important;
+}
+
+.nav-item.active > .enterprise-nav-link svg,
+.enterprise-nav-link.active svg {
+    color: var(--saham-blue-vibrant) !important;
+    stroke: var(--saham-blue-vibrant) !important;
+}
+
+.enterprise-nav-list .nav-item {
+    border: none !important;
+    position: relative !important;
+}
+
+.enterprise-nav-list .nav-item::after,
+.enterprise-nav-list .nav-item.active::after {
+    display: none !important;
+    content: none !important;
+}
+
+.enterprise-dropdown-menu {
+    border-radius: var(--saham-radius) !important;
+    border: 1px solid var(--saham-border-blue) !important;
+    padding: 0.5rem !important;
+    min-width: 270px !important;
+    box-shadow: var(--saham-shadow-lg) !important;
+    background: var(--saham-white) !important;
+}
+
+.enterprise-dropdown-menu .dropdown-item {
+    border-radius: var(--saham-radius-sm) !important;
+    padding: 0.6rem 0.75rem !important;
+    transition: all 0.15s ease !important;
+}
+
+.enterprise-dropdown-menu .dropdown-item:hover,
+.enterprise-dropdown-menu .dropdown-item.active {
+    background-color: var(--saham-blue-ice) !important;
+    color: var(--saham-blue-royal) !important;
+}
+
+.dropdown-icon-box {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 9px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    margin-right: 0.35rem !important;
+}
+
+.dropdown-text-wrap {
+    line-height: 1.25 !important;
+}
+
+.dropdown-text-wrap .fw-semibold {
+    font-size: 0.875rem !important;
+    letter-spacing: -0.01em !important;
+}
+
+.dropdown-text-wrap .small {
+    font-size: 0.75rem !important;
+}
+
+/* ==========================================================================
+   5. Company Growth Status Banner & Widgets (Enterprise Blue-White Theme)
+   ========================================================================== */
+.growth-status-banner {
+    background: var(--saham-banner-gradient) !important;
+    color: var(--saham-text-main) !important;
+    border-radius: var(--saham-radius);
+    padding: 1.75rem 2rem;
+    box-shadow: var(--saham-shadow-md);
+    border: 1px solid var(--saham-border-strong) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.growth-status-banner::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: var(--saham-accent-bar-gradient);
+}
+
+.growth-status-banner::after {
+    content: "";
+    position: absolute;
+    top: -40%;
+    right: -5%;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(
+        circle,
+        rgba(37, 99, 235, 0.08) 0%,
+        rgba(37, 99, 235, 0) 70%
+    );
+    pointer-events: none;
+}
+
+.growth-metric-box {
+    background: var(--saham-white) !important;
+    border: 1px solid var(--saham-border-blue) !important;
+    border-radius: var(--saham-radius-sm);
+    padding: 0.6rem 1rem;
+    color: var(--saham-text-main) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    box-shadow: 0 1px 3px rgba(10, 37, 64, 0.04);
+    transition: all 0.2s ease;
+}
+
+.growth-metric-box:hover {
+    border-color: var(--saham-border-strong) !important;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.08);
+    transform: translateY(-1px);
+}
+
+.growth-metric-box span.metric-label {
+    color: var(--saham-text-muted) !important;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.growth-metric-box strong.metric-value {
+    color: var(--saham-text-main) !important;
+    font-weight: 700;
+    font-size: 0.95rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.growth-side-card {
+    background: var(--saham-white) !important;
+    border: 1px solid var(--saham-border-strong) !important;
+    border-radius: var(--saham-radius);
+    padding: 1.35rem;
+    color: var(--saham-text-main) !important;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.06);
+}
+
+.growth-side-card .label-muted {
+    color: var(--saham-text-muted) !important;
+    font-size: 0.8125rem;
+    font-weight: 500;
+}
+
+.growth-side-card .value-highlight {
+    color: var(--saham-blue-royal) !important;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   6. Financial Metric Stat Cards (Modern Elevation & Fluid Numbers)
+   ========================================================================== */
+.finance-stat-card {
+    background: var(--saham-white) !important;
+    border-radius: var(--saham-radius);
+    border: 1px solid var(--saham-border) !important;
+    box-shadow: var(--saham-shadow-sm);
+    padding: 1.25rem 1.35rem;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.finance-stat-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--saham-royal-gradient);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.finance-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 10px 25px -3px rgba(30, 64, 175, 0.09),
+        0 4px 6px -2px rgba(30, 64, 175, 0.04) !important;
+    border-color: var(--saham-border-strong) !important;
+}
+
+.finance-stat-card:hover::after {
+    opacity: 1;
+}
+
+.finance-stat-card h3 {
+    font-size: clamp(1.15rem, 2.2vw, 1.38rem) !important;
+    color: var(--saham-text-main) !important;
+    letter-spacing: -0.025em !important;
+    font-weight: 700 !important;
+}
+
+.finance-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    background-color: var(--saham-blue-ice);
+    color: var(--saham-blue-royal);
+}
+
+/* ==========================================================================
+   7. Terminal Multi-Web Chart Box (ApexCharts & Timeframe Filters)
+   ========================================================================== */
+.terminal-chart-card {
+    background: var(--saham-white) !important;
+    border-radius: var(--saham-radius);
+    border: 1px solid var(--saham-border) !important;
+    box-shadow: var(--saham-shadow-sm);
+    overflow: hidden;
+}
+
+.terminal-chart-card .card-header {
+    background: var(--saham-white) !important;
+    border-bottom: 1px solid var(--saham-border) !important;
+    padding: 1rem 1.25rem !important;
+}
+
+#timeframe-btn-group {
+    display: inline-flex;
+    border-radius: var(--saham-radius-sm);
+    border: 1px solid var(--saham-border);
+    padding: 2px;
+    background: var(--saham-white);
+}
+
+.terminal-timeframe-btn {
+    padding: 0.35rem 0.85rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: var(--saham-text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.terminal-timeframe-btn:hover {
+    background: var(--saham-blue-soft);
+    color: var(--saham-blue-royal);
+}
+
+.terminal-timeframe-btn.active {
+    background: var(--saham-blue-vibrant) !important;
+    color: var(--saham-white) !important;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+}
+
+.chart-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    backdrop-filter: blur(2px);
+}
+
+/* Footnote metrics in Chart */
+.terminal-chart-card .card-footer {
+    background: var(--saham-surface-subtle) !important;
+    border-top: 1px solid var(--saham-border) !important;
+    padding: 0.75rem 1.25rem !important;
+}
+
+/* ==========================================================================
+   8. Tables & Data Lists (Professional Blue & White Styling)
+   ========================================================================== */
+.card-table,
+.table {
+    color: var(--saham-text-body) !important;
+    margin-bottom: 0;
+}
+
+.card-table thead th,
+.table thead th {
+    background-color: var(--saham-blue-soft) !important;
+    color: var(--saham-blue-dark) !important;
+    font-size: 0.725rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    border-top: 1px solid var(--saham-border-blue) !important;
+    border-bottom: 2px solid var(--saham-border-strong) !important;
+    padding: 0.85rem 1rem !important;
+    white-space: nowrap;
+}
+
+.card-table tbody td,
+.table tbody td {
+    padding: 0.85rem 1rem !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    color: var(--saham-text-body) !important;
+    font-size: 0.875rem !important;
+    vertical-align: middle;
+}
+
+.card-table tbody tr,
+.table-hover tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.card-table tbody tr:hover,
+.table-hover tbody tr:hover {
+    background-color: var(--saham-surface-subtle) !important;
+}
+
+.table-responsive {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f8fafc;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 9999px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+}
+
+/* ==========================================================================
+   9. Shareholder 1-to-Many Cards & Visual Items
+   ========================================================================== */
+.share-holding-item {
+    border-left: 4px solid var(--saham-blue-vibrant);
+    background: var(--saham-white);
+    border-top: 1px solid var(--saham-border);
+    border-right: 1px solid var(--saham-border);
+    border-bottom: 1px solid var(--saham-border);
+    border-radius: 0 var(--saham-radius-sm) var(--saham-radius-sm) 0;
+    padding: 0.85rem 1.15rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.18s ease;
+}
+
+.share-holding-item:hover {
+    background: var(--saham-surface-subtle);
+    border-color: var(--saham-border-strong);
+    transform: translateX(2px);
+}
+
+.shareholder-avatar-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--saham-royal-gradient);
+    color: var(--saham-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.05rem;
+    box-shadow: 0 2px 6px rgba(30, 64, 175, 0.22);
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   10. Multi-Web Badges & System Pills (Crisp Corporate Tones)
+   ========================================================================== */
+.web-badge-pill {
+    padding: 0.3rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
+.web-badge-operasional {
+    background: #fef3c7 !important;
+    color: #92400e !important;
+    border: 1px solid #fde68a;
+}
+
+.web-badge-keuangan {
+    background: #d1fae5 !important;
+    color: #065f46 !important;
+    border: 1px solid #a7f3d0;
+}
+
+.web-badge-investor {
+    background: #dbeafe !important;
+    color: #1e40af !important;
+    border: 1px solid #bfdbfe;
+}
+
+.web-badge-slipgaji {
+    background: #ede9fe !important;
+    color: #5b21b6 !important;
+    border: 1px solid #ddd6fe;
+}
+
+/* Standard Tabler Theme Badges Overrides */
+.badge.bg-blue-lt,
+.badge-soft-primary {
+    background-color: var(--saham-blue-ice) !important;
+    color: var(--saham-blue-royal) !important;
+    border: 1px solid var(--saham-border-strong) !important;
+}
+
+.badge.bg-azure-lt {
+    background-color: #f0f9ff !important;
+    color: #0284c7 !important;
+    border: 1px solid #bae6fd !important;
+}
+
+/* ==========================================================================
+   11. Buttons & Form Controls (Refined Blue & White UI)
+   ========================================================================== */
+.btn-primary {
+    background: var(--saham-blue-royal) !important;
+    border-color: var(--saham-blue-royal) !important;
+    color: var(--saham-white) !important;
+    box-shadow: 0 1px 3px 0 rgba(30, 64, 175, 0.25) !important;
+    transition: all 0.18s ease !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: var(--saham-accent-hover) !important;
+    border-color: var(--saham-accent-hover) !important;
+    box-shadow: 0 4px 12px 0 rgba(37, 99, 235, 0.3) !important;
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+    color: var(--saham-blue-royal) !important;
+    border-color: var(--saham-border-strong) !important;
+    background-color: var(--saham-white) !important;
+    transition: all 0.18s ease !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+    background-color: var(--saham-blue-ice) !important;
+    border-color: var(--saham-blue-royal) !important;
+    color: var(--saham-blue-royal) !important;
+    transform: translateY(-1px);
+}
+
+.form-control,
+.form-select {
+    background-color: var(--saham-white) !important;
+    border: 1px solid var(--saham-border) !important;
+    color: var(--saham-text-body) !important;
+    border-radius: var(--saham-radius-sm) !important;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--saham-blue-bright) !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14) !important;
+}
+
+/* Card Wrappers */
+.card {
+    background-color: var(--saham-white) !important;
+    border: 1px solid var(--saham-border) !important;
+    border-radius: var(--saham-radius) !important;
+    box-shadow: var(--saham-shadow-sm) !important;
+}
+
+.card-header {
+    background-color: var(--saham-white) !important;
+    border-bottom: 1px solid var(--saham-border) !important;
+    padding: 1rem 1.25rem !important;
+}
+
+/* ==========================================================================
+   12. RESPONSIVE DESIGN & MOBILE BREAKPOINT OPTIMIZATIONS
+   ========================================================================== */
+
+/* --- A. Tablet & Small Laptop (max-width: 991.98px) --- */
+@media (max-width: 991.98px) {
+    .growth-side-card {
+        min-width: 0 !important;
+        width: 100% !important;
+        margin-top: 1.25rem;
+    }
+}
+
+/* --- B. Mobile Drawer & Tablet Portrait (max-width: 767.98px) --- */
+@media (max-width: 767.98px) {
+    /* Header Container */
+    .enterprise-top-header {
+        padding: 0.5rem 0 !important;
+    }
+
+    .enterprise-top-header .container-xl {
+        gap: 0.5rem !important;
+    }
+
+    /* Brand Lockup scaling */
+    .brand-logo-frame {
+        max-width: 110px;
+        height: 34px;
+        padding: 2px 5px;
+    }
+
+    .brand-logo-img {
+        height: 22px;
+    }
+
+    .brand-name-bold {
+        font-size: 0.925rem;
+    }
+
+    .brand-tagline {
+        display: none;
+    }
+
+    .brand-portal-tag {
+        font-size: 0.55rem;
+        padding: 0.1rem 0.35rem;
+    }
+
+    /* Mobile Navigation Drawer */
+    .enterprise-navbar-wrapper .collapse.show,
+    .enterprise-navbar-wrapper .collapsing {
+        background: var(--saham-white) !important;
+        padding: 0.75rem 0.5rem 1rem 0.5rem !important;
+        border-top: 1px solid var(--saham-border) !important;
+        box-shadow: var(--saham-shadow-md) !important;
+    }
+
+    .enterprise-nav-list {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 4px !important;
+        width: 100% !important;
+    }
+
+    .enterprise-nav-link {
+        width: 100% !important;
+        padding: 0.65rem 0.85rem !important;
+        font-size: 0.9rem !important;
+        justify-content: flex-start !important;
+    }
+
+    /* Accordion Sub-menus for Master Data on Mobile */
+    .enterprise-navbar-wrapper .dropdown-menu.enterprise-dropdown-menu {
+        position: static !important;
+        float: none !important;
+        width: 100% !important;
+        min-width: unset !important;
+        box-shadow: none !important;
+        border: 1px solid var(--saham-border-blue) !important;
+        background-color: var(--saham-surface-subtle) !important;
+        margin-top: 0.35rem !important;
+        margin-bottom: 0.35rem !important;
+        padding: 0.4rem !important;
+        border-radius: var(--saham-radius-sm) !important;
+    }
+
+    .enterprise-navbar-wrapper
+        .dropdown-menu.enterprise-dropdown-menu
+        .dropdown-item {
+        padding: 0.55rem 0.75rem !important;
+        margin-bottom: 2px;
+    }
+
+    /* Growth Status Banner Mobile */
+    .growth-status-banner {
+        padding: 1.25rem 1.15rem !important;
+    }
+
+    .growth-status-banner h2.h1 {
+        font-size: 1.35rem !important;
+    }
+
+    .growth-status-banner .d-flex.flex-wrap.gap-2 {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.5rem !important;
+        width: 100%;
+    }
+
+    .growth-metric-box {
+        display: flex !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+
+    /* Terminal Multi-Web Chart Card Mobile */
+    .terminal-chart-card .card-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+
+    .terminal-chart-card .card-header > div:last-child {
+        width: 100% !important;
+        justify-content: space-between !important;
+    }
+
+    /* 2x2 Grid for Chart Footnote on Mobile */
+    .terminal-chart-card .card-footer .row {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.75rem !important;
+    }
+
+    .terminal-chart-card .card-footer .row > [class*="col-"] {
+        width: 100% !important;
+        padding: 0.25rem !important;
+    }
+
+    /* Card Header Search & Filter Forms */
+    .card-header.d-flex.flex-wrap {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.75rem !important;
+    }
+
+    .card-header form.d-flex.flex-wrap {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+
+    .card-header form .input-icon,
+    .card-header form select,
+    .card-header form button {
+        width: 100% !important;
+    }
+}
+
+/* --- C. Standard Smartphone Screens (max-width: 575.98px) --- */
+@media (max-width: 575.98px) {
+    /* Page Header Mobile */
+    .page-header {
+        padding-top: 0.85rem !important;
+        padding-bottom: 0.85rem !important;
+    }
+
+    .page-title {
+        font-size: 1.25rem !important;
+    }
+
+    .page-header .btn-list {
+        margin-top: 0.5rem;
+        width: 100%;
+    }
+
+    .page-header .btn-list .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* User Profile Dropdown boundary constraint */
+    .enterprise-user-dropdown {
+        min-width: 200px !important;
+        max-width: calc(100vw - 20px) !important;
+        right: 0 !important;
+        left: auto !important;
+    }
+
+    /* Financial Metric Stat Cards Mobile */
+    .finance-stat-card {
+        padding: 1rem 1.15rem !important;
+    }
+
+    .finance-stat-card h3 {
+        font-size: 1.2rem !important;
+    }
+
+    .finance-stat-icon {
+        width: 38px !important;
+        height: 38px !important;
+    }
+
+    /* Horizontal Scrollable Timeframe Buttons on Phones */
+    #timeframe-btn-group {
+        display: flex !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        width: 100% !important;
+        scrollbar-width: none !important; /* Firefox */
+    }
+
+    #timeframe-btn-group::-webkit-scrollbar {
+        display: none !important; /* Chrome/Safari */
+    }
+
+    .terminal-timeframe-btn {
+        flex: 1 0 auto !important;
+        text-align: center !important;
+        padding: 0.4rem 0.65rem !important;
+        font-size: 0.725rem !important;
+    }
+
+    /* Shareholder card in detail view */
+    .shareholder-avatar-circle {
+        width: 38px;
+        height: 38px;
+        font-size: 0.9rem;
+    }
+
+    /* Modals on Mobile */
+    .modal-dialog {
+        margin: 0.5rem !important;
+    }
+
+    .modal-content {
+        border-radius: var(--saham-radius) !important;
+    }
+
+    /* Settings Page Nav Pills Mobile */
+    .settings-nav-pills {
+        flex-direction: column !important;
+    }
+
+    .settings-nav-link {
+        justify-content: flex-start !important;
+        padding: 0.65rem 0.85rem !important;
+    }
+}
+
+/* --- D. Ultra-Narrow Small Phones (max-width: 379.98px) --- */
+@media (max-width: 379.98px) {
+    .enterprise-brand-link {
+        gap: 0.35rem;
+    }
+
+    .brand-logo-frame {
+        max-width: 85px;
+        height: 30px;
+        padding: 1px 3px;
+    }
+
+    .brand-logo-img {
+        height: 18px;
+    }
+
+    .brand-name-bold {
+        font-size: 0.85rem;
+    }
+
+    .growth-status-banner .d-flex.flex-wrap.gap-2 {
+        grid-template-columns: 1fr !important;
+    }
+
+    .terminal-chart-card .card-footer .row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ==========================================================================
+   13. NATIVE ANDROID FINTECH APP INTERFACE (Mobile App System)
+   ========================================================================== */
+
+/* Page Wrapper Bottom Spacing on Mobile for Dock Navigation */
+@media (max-width: 767.98px) {
+  body {
+    padding-bottom: 70px !important;
+  }
+  
+  .page-wrapper {
+    padding-bottom: 74px !important;
+  }
+
+  /* Completely Hide Desktop Footer on Mobile / Android View */
+  footer,
+  footer.footer,
+  .footer,
+  .footer-transparent,
+  .d-print-none.footer,
+  .page-wrapper > footer,
+  .page > footer {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+  }
+
+  /* Hide Desktop Page Header on Mobile (Replaced by Native App Bar) */
+  .page-header {
+    display: none !important;
+  }
+}
+
+/* --- A. Native Android Bottom Navigation Dock (Rock-solid Fixed & Polished) --- */
+.android-bottom-nav {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 999999 !important;
+  background: #ffffff !important;
+  border-top: 1px solid #e2e8f0 !important;
+  box-shadow: 0 -3px 18px rgba(10, 37, 64, 0.08) !important;
+  height: 64px !important;
+  padding: 4px 0 calc(4px + env(safe-area-inset-bottom, 0px)) 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.android-bottom-nav-inner {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+  height: 56px !important;
+  max-width: 480px !important;
+  margin: 0 auto !important;
+  padding: 0 8px !important;
+  box-sizing: border-box !important;
+}
+
+.android-nav-tab {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  text-decoration: none !important;
+  color: #64748b !important;
+  transition: color 0.15s ease, transform 0.15s ease !important;
+  user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  padding: 2px 0 !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+}
+
+.android-tab-icon-wrap {
+  width: 48px !important;
+  height: 26px !important;
+  border-radius: 13px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.android-tab-icon-wrap svg {
+  width: 20px !important;
+  height: 20px !important;
+  display: block !important;
+  vertical-align: middle !important;
+  margin: 0 auto !important;
+  transition: transform 0.18s ease !important;
+}
+
+.android-tab-label {
+  font-size: 0.68rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  display: block !important;
+}
+
+.android-nav-tab:active .android-tab-icon-wrap {
+  transform: scale(0.92) !important;
+}
+
+.android-nav-tab.active {
+  color: var(--saham-blue-royal) !important;
+}
+
+.android-nav-tab.active .android-tab-icon-wrap {
+  background-color: #dbeafe !important;
+  color: var(--saham-blue-royal) !important;
+}
+
+.android-nav-tab.active .android-tab-icon-wrap svg {
+  stroke: var(--saham-blue-royal) !important;
+  transform: scale(1.05) !important;
+}
+
+.android-nav-tab.active .android-tab-label {
+  font-weight: 700 !important;
+  color: var(--saham-blue-royal) !important;
+}
+
+/* --- B. Android Top Greeting Bar --- */
+.android-greeting-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.25rem 0.85rem 0.25rem;
+}
+
+.android-user-greeting {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.android-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--saham-royal-gradient);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(30, 64, 175, 0.25);
+  flex-shrink: 0;
+}
+
+.android-greeting-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--saham-text-main);
+  line-height: 1.2;
+}
+
+.android-greeting-sub {
+  font-size: 0.725rem;
+  color: var(--saham-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.android-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.android-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid var(--saham-border-blue);
+  color: var(--saham-text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(10, 37, 64, 0.05);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.android-icon-btn:active {
+  background: var(--saham-blue-ice);
+  transform: scale(0.92);
+}
+
+/* --- C. Android Hero Wallet / Balance Card --- */
+.android-hero-wallet {
+  margin-bottom: 1.15rem;
+}
+
+.android-wallet-card {
+  background: linear-gradient(135deg, #0a2540 0%, #0f2942 35%, #1e40af 100%);
+  border-radius: 20px;
+  padding: 1.35rem 1.25rem 1.15rem 1.25rem;
+  color: #ffffff;
+  box-shadow: 0 10px 25px -4px rgba(10, 37, 64, 0.35), 0 4px 10px -2px rgba(37, 99, 235, 0.2);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.android-wallet-bg-pattern {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(30, 64, 175, 0) 70%);
+  pointer-events: none;
+}
+
+.android-wallet-label {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: #bfdbfe;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+}
+
+.android-wallet-eye-btn {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.android-wallet-eye-btn:active {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(0.9);
+}
+
+.android-wallet-amount {
+  font-size: 1.65rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  letter-spacing: -0.03em;
+  margin: 0.35rem 0 0.85rem 0;
+  line-height: 1.15;
+  color: #ffffff;
+}
+
+.android-wallet-subchips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 1.15rem;
+}
+
+.android-subchip {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.725rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #f1f5f9;
+  backdrop-filter: blur(4px);
+}
+
+.subchip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.android-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding-top: 1rem;
+}
+
+.android-action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none !important;
+  color: #ffffff;
+  gap: 6px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.android-action-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  transition: transform 0.15s ease, background 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.android-action-item:active .android-action-icon {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.android-action-item span {
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: #e0f2fe;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* --- D. Android Responsive 2-Column Insight Chips Grid (No Horizontal Scroll) --- */
+.android-insight-chips-bar {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 1.15rem;
+}
+
+.android-insight-chip {
+  background: #ffffff;
+  border: 1px solid var(--saham-border-blue);
+  border-radius: 12px;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.725rem;
+  box-shadow: 0 1px 3px rgba(10, 37, 64, 0.04);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--saham-text-main);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.android-insight-chip > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.android-insight-chip svg,
+.android-insight-chip > span:first-child {
+  flex-shrink: 0;
+}
+
+.android-insight-chip strong {
+  font-weight: 700;
+}
+
+/* --- E. Android 2x2 Metric Cards Grid --- */
+.android-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 1.15rem;
+}
+
+.android-metric-card {
+  background: #ffffff;
+  border: 1px solid var(--saham-border);
+  border-radius: 16px;
+  padding: 0.95rem;
+  box-shadow: 0 2px 6px rgba(10, 37, 64, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 105px;
+}
+
+.android-metric-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.35rem;
+}
+
+.android-metric-title {
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: var(--saham-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.android-metric-mini-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.android-metric-val {
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--saham-text-main);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.android-metric-foot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 0.25rem;
+  font-size: 0.725rem;
+}
+
+/* --- F. Android Health & Performance Sheet Card --- */
+.android-health-sheet {
+  background: #ffffff;
+  border: 1px solid var(--saham-border-strong);
+  border-radius: 16px;
+  padding: 1.1rem;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.06);
+  margin-bottom: 1.15rem;
+}
+
+.android-health-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.android-health-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--saham-text-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.android-health-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.35rem 0;
+  font-size: 0.8rem;
+  color: var(--saham-text-secondary);
+}
+
+.android-health-row strong {
+  color: var(--saham-text-main);
+  font-family: var(--font-mono);
+}
+
+/* --- G. Android Native Transaction / Log List --- */
+.android-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1.25rem 0.25rem 0.65rem 0.25rem;
+}
+
+.android-section-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--saham-text-main);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.android-section-more {
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--saham-blue-royal);
+  text-decoration: none;
+}
+
+.android-tx-card {
+  background: #ffffff;
+  border: 1px solid var(--saham-border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(10, 37, 64, 0.04);
+}
+
+.android-tx-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.android-tx-item:last-child {
+  border-bottom: none;
+}
+
+.android-tx-item:active {
+  background: var(--saham-surface-subtle);
+}
+
+.android-tx-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.android-tx-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.android-tx-info {
+  min-width: 0;
+}
+
+.android-tx-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--saham-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.android-tx-meta {
+  font-size: 0.725rem;
+  color: var(--saham-text-muted);
+}
+
+.android-tx-amount {
+  text-align: right;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   16. Executive Investor Hero Banner & Desk Dashboard Styles
+   ========================================================================== */
+.investor-hero-card {
+  background: linear-gradient(135deg, #0a2540 0%, #0f3057 50%, #1e40af 100%) !important;
+  border-radius: 16px !important;
+  padding: 1.75rem 2rem !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 25px -5px rgba(10, 37, 64, 0.25), 0 8px 10px -6px rgba(10, 37, 64, 0.2) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.investor-hero-card::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0) 70%);
+  pointer-events: none;
+}
+
+.investor-hero-card::after {
+  content: "";
+  position: absolute;
+  bottom: -60px;
+  left: 20%;
+  width: 300px;
+  height: 150px;
+  background: radial-gradient(ellipse, rgba(37, 99, 235, 0.18) 0%, rgba(37, 99, 235, 0) 70%);
+  pointer-events: none;
+}
+
+.investor-glass-box {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 14px !important;
+  padding: 1.25rem 1.5rem !important;
+}
+
+.investor-avatar-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(10, 37, 64, 0.35);
+  flex-shrink: 0;
+}
+
+.scroll-anchor-target {
+  scroll-margin-top: 90px;
+}
+
+/* ===== Investor Profile Grid (Desktop Hero Banner) ===== */
+.investor-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.investor-profile-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+  min-width: 0;
+}
+
+.investor-profile-item svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.investor-profile-label {
+  opacity: 0.65;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.investor-profile-label::after {
+  content: ":";
+}
+
+.investor-profile-value {
+  color: #ffffff;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===== Mobile Metric Cards Refinement ===== */
+@media (max-width: 767.98px) {
+  .android-metric-card {
+    padding: 14px 16px !important;
+  }
+
+  .android-metric-val {
+    font-size: 1.15rem !important;
+    line-height: 1.3 !important;
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .android-metric-header {
+    margin-bottom: 2px !important;
+  }
+
+  .android-metric-title {
+    font-size: 0.68rem !important;
+    letter-spacing: 0.03em !important;
+  }
+
+  .android-insight-chips-bar {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .android-insight-chip {
+    padding: 0.45rem 0.55rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .android-wallet-card {
+    padding: 1.25rem 1.1rem 1rem 1.1rem !important;
+  }
+
+  .android-wallet-amount {
+    font-size: 1.55rem !important;
+  }
+}
+
+@media (max-width: 350px) {
+  .android-insight-chips-bar {
+    grid-template-columns: 1fr !important;
+  }
+  .android-wallet-amount {
+    font-size: 1.35rem !important;
+  }
+}
+
+/* ==========================================================================
+   SMOOTH SCROLLING & SKELETON SHIMMER SYSTEM
+   ========================================================================== */
+html {
+  scroll-behavior: smooth !important;
+}
+
+body {
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-anchor-target {
+  scroll-margin-top: 85px !important;
+}
+
+@media (max-width: 767.98px) {
+  .scroll-anchor-target {
+    scroll-margin-top: 70px !important;
+  }
+}
+
+/* Shimmer Keyframe Animation */
+@keyframes shimmerWave {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Base Skeleton Shimmer Class */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmerWave 1.6s infinite ease-in-out;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.skeleton-shimmer-blue {
+  background: linear-gradient(90deg, #eff6ff 25%, #dbeafe 50%, #eff6ff 75%);
+  background-size: 200% 100%;
+  animation: shimmerWave 1.6s infinite ease-in-out;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* Common Skeleton Placeholders */
+.skeleton-box {
+  display: block;
+  width: 100%;
+}
+
+.skeleton-circle {
+  border-radius: 50% !important;
+  flex-shrink: 0;
+}
+
+.skeleton-pill {
+  border-radius: 9999px !important;
+}
+
+.skeleton-text {
+  height: 14px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+}
+
+.skeleton-card {
+  background: #ffffff;
+  border: 1px solid #edf2f7;
+  border-left: 4px solid #cbd5e1 !important;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+
+/* Smooth Tab Transitions */
+.tab-pane.fade {
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(4px);
+}
+
+.tab-pane.fade.show {
+  transform: translateY(0);
+}
+
+
