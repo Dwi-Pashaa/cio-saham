@@ -311,6 +311,7 @@
         <!-- 5. Dokumen Lampiran Info & CTA Buttons -->
         <tr>
             <td style="padding: 0 30px 30px 30px; text-align: center;" class="content-padding">
+                @if(class_exists('\Barryvdh\DomPDF\Facade\Pdf'))
                 <div style="background-color: #eff6ff; border: 1px dashed #93c5fd; border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; text-align: left;">
                     <table width="100%">
                         <tr>
@@ -328,6 +329,7 @@
                         </tr>
                     </table>
                 </div>
+                @endif
 
                 <table width="100%">
                     <tr>

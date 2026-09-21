@@ -78,25 +78,35 @@ class DailyFinancialReportMail extends Mailable
      */
     public function attachments(): array
     {
-        $reportDate = !empty($this->dailyData['date']) 
-            ? Carbon::parse($this->dailyData['date'])->format('Y-m-d') 
-            : Carbon::now()->format('Y-m-d');
-            
-        $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $this->shareholder->name ?? 'Investor');
-        $fileName = "Laporan_Finansial_Harian_{$reportDate}_{$safeName}.pdf";
+        // Graceful fallback jika library dompdf belum terinstall di server hosting
+        if (!class_exists('\Barryvdh\DomPDF\Facade\Pdf')) {
+            return [];
+        }
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.daily_financial_report', [
-            'shareholder'    => $this->shareholder,
-            'dailyData'      => $this->dailyData,
-            'personalProfit' => $this->personalProfit,
-            'setting'        => $this->setting,
-        ])->setPaper('a4', 'portrait');
+        try {
+            $reportDate = !empty($this->dailyData['date']) 
+                ? Carbon::parse($this->dailyData['date'])->format('Y-m-d') 
+                : Carbon::now()->format('Y-m-d');
+                
+            $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $this->shareholder->name ?? 'Investor');
+            $fileName = "Laporan_Finansial_Harian_{$reportDate}_{$safeName}.pdf";
 
-        return [
-            \Illuminate\Mail\Mailables\Attachment::fromData(
-                fn () => $pdf->output(),
-                $fileName
-            )->withMime('application/pdf'),
-        ];
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.daily_financial_report', [
+                'shareholder'    => $this->shareholder,
+                'dailyData'      => $this->dailyData,
+                'personalProfit' => $this->personalProfit,
+                'setting'        => $this->setting,
+            ])->setPaper('a4', 'portrait');
+
+            return [
+                \Illuminate\Mail\Mailables\Attachment::fromData(
+                    fn () => $pdf->output(),
+                    $fileName
+                )->withMime('application/pdf'),
+            ];
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("Gagal membuat attachment PDF laporan: " . $e->getMessage());
+            return [];
+        }
     }
 }
