@@ -5,12 +5,15 @@ namespace Tests\Feature;
 use App\Models\Shareholder;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class InvestorDirectoryTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -56,12 +59,12 @@ class InvestorDirectoryTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Direktori Pemegang Saham');
         $response->assertSee('Portofolio Investor');
-        $response->assertSee('Budi Santoso');
+        $response->assertSee('table-investor-directory');
 
-        // 2. Test pencarian dengan kata kunci
-        $searchResponse = $this->actingAs($user)->get(route('investor-directory.index', ['search' => 'Budi']));
-        $searchResponse->assertStatus(200);
-        $searchResponse->assertSee('Budi Santoso');
+        // 2. Test AJAX DataTables request & pencarian dengan kata kunci
+        $ajaxResponse = $this->actingAs($user)->getJson(route('investor-directory.index', ['search' => ['value' => 'Budi']]), ['X-Requested-With' => 'XMLHttpRequest']);
+        $ajaxResponse->assertStatus(200);
+        $ajaxResponse->assertSee('Budi Santoso');
 
         // 3. Test halaman show portofolio (Read-Only)
         $showResponse = $this->actingAs($user)->get(route('investor-directory.show', $shareholder->id));

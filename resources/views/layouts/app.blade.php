@@ -14,13 +14,12 @@
 	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 	<!-- CSS files -->
-	<link href="{{asset('')}}css/tabler.min.css?1738096685" rel="stylesheet" />
-	<link href="{{asset('')}}css/tabler-flags.min.css?1738096685" rel="stylesheet" />
-	<link href="{{asset('')}}css/tabler-socials.min.css?1738096685" rel="stylesheet" />
-	<link href="{{asset('')}}css/tabler-payments.min.css?1738096685" rel="stylesheet" />
-	<link href="{{asset('')}}css/tabler-vendors.min.css?1738096685" rel="stylesheet" />
-	<link href="{{asset('')}}css/tabler-marketing.min.css?1738096685" rel="stylesheet" />
-	<link href="{{asset('')}}css/demo.min.css?1738096685" rel="stylesheet" />
+	<link href="{{asset('css/tabler.min.css?1738096685')}}" rel="stylesheet" />
+	<link href="{{asset('css/tabler-vendors.min.css?1738096685')}}" rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+	<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 	<link href="{{asset('css/custom-theme.css')}}?v={{ time() }}" rel="stylesheet" />
 	<link href="{{asset('css/cio-saham.css')}}?v={{ time() }}" rel="stylesheet" />
 	@stack('css')
@@ -96,21 +95,47 @@
 
 	<!-- Libs JS -->
 	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-	<script src="{{asset('')}}libs/apexcharts/dist/apexcharts.min.js?1738096685" defer></script>
-	<script src="{{asset('')}}libs/jsvectormap/dist/jsvectormap.min.js?1738096685" defer></script>
-	<script src="{{asset('')}}libs/jsvectormap/dist/maps/world.js?1738096685" defer></script>
-	<script src="{{asset('')}}libs/jsvectormap/dist/maps/world-merc.js?1738096685" defer></script>
+	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+	<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+	<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+	<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+	<script src="{{asset('libs/apexcharts/dist/apexcharts.min.js?1738096685')}}" defer></script>
 	<!-- Tabler Core -->
-	<script src="{{asset('')}}js/tabler.min.js?1738096685" defer></script>
+	<script src="{{asset('js/tabler.min.js?1738096685')}}" defer></script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script>
 		$.ajaxSetup({
 			headers: {
 				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 			}
-		}); 
+		});
+
+		// Global DataTables Default Settings
+		if ($.fn.dataTable) {
+			$.extend(true, $.fn.dataTable.defaults, {
+				language: {
+					processing: '<div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div> Memuat data...',
+					search: "_INPUT_",
+					searchPlaceholder: "Pencarian cepat...",
+					lengthMenu: "Tampilkan _MENU_ data",
+					info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+					infoEmpty: "Menampilkan 0 s/d 0 dari 0 data",
+					infoFiltered: "(disaring dari _MAX_ total data)",
+					zeroRecords: "Tidak ada data yang cocok ditemukan",
+					emptyTable: "Belum ada data yang tersedia di tabel ini",
+					paginate: {
+						first: "Awal",
+						previous: "Sebelumnya",
+						next: "Berikutnya",
+						last: "Akhir"
+					}
+				}
+			});
+		}
 	</script>
 	@stack('js')
+	@stack('scripts')
 </body>
 
 </html>

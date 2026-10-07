@@ -56,6 +56,14 @@ class Shareholder extends Model
     }
 
     /**
+     * Relasi ke Aset yang dimiliki pemegang saham ini.
+     */
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class);
+    }
+
+    /**
      * Accessor: Total lembar saham milik pemegang saham ini (akumulasi semua saham).
      */
     public function getTotalSharesAttribute(): int

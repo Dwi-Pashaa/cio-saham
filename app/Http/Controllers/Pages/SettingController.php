@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Pages;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\FonnteService;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
@@ -16,11 +17,6 @@ class SettingController extends Controller
                 'telp'                   => '628123456789',
                 'notification_channel'   => 'whatsapp',
                 'admin_fee'              => 0,
-                'cio_finance_base_url'   => 'https://finance.cionetwork.id',
-                'cio_finance_client_id'  => 'test_web_saham_18dcf3aab5a0d552f5670a3978c7cd22',
-                'cio_finance_key_id'     => 'kid_4e0479ba4b715ac5',
-                'cio_finance_secret_key' => 'b60777bc6d6569ad65f875e81f824cda74b3c1cb05a188081ef974ee6c943ed7',
-                'cio_finance_timeout'    => 30,
             ]);
         }
         $dashboardColumns = Setting::dashboardColumns();
@@ -30,46 +26,53 @@ class SettingController extends Controller
     public function store(Request $request) 
     {
         $request->validate([
-            "telp"                   => "nullable|string",
-            "notification_channel"   => "nullable|in:whatsapp,email,both,none",
-            "admin_fee"              => "nullable",
-            "cio_finance_base_url"   => "nullable|string",
-            "cio_finance_client_id"  => "nullable|string",
-            "cio_finance_key_id"     => "nullable|string",
-            "cio_finance_secret_key" => "nullable|string",
-            "cio_finance_timeout"    => "nullable|numeric",
-            "xendit_secret_key"      => "nullable|string",
-            "xendit_webhook_token"   => "nullable|string",
+            "telp"                 => "nullable|string",
+            "notification_channel" => "nullable|in:whatsapp,email,both,none",
+            "fonnte_token"         => "nullable|string",
+            "target_wa_kas"        => "nullable|string",
+            "admin_fee"            => "nullable",
         ]);
 
         $setting = Setting::find($request->id ?? 1);
         $telp = $request->has('telp') ? $request->telp : ($setting->telp ?? '628123456789');
         $notificationChannel = $request->notification_channel ?? ($setting->notification_channel ?? 'whatsapp');
+        $fonnteToken = $request->has('fonnte_token') ? $request->fonnte_token : ($setting->fonnte_token ?? null);
+        $targetWaKas = $request->has('target_wa_kas') ? $request->target_wa_kas : ($setting->target_wa_kas ?? null);
         $adminFee = $request->has('admin_fee') ? (float) str_replace('.', '', $request->admin_fee ?? 0) : ($setting->admin_fee ?? 0);
-
-        $baseUrl   = $request->filled('cio_finance_base_url') ? rtrim($request->cio_finance_base_url, '/') : ($setting->cio_finance_base_url ?? 'https://finance.cionetwork.id');
-        $clientId  = $request->filled('cio_finance_client_id') ? $request->cio_finance_client_id : ($setting->cio_finance_client_id ?? 'test_web_saham_18dcf3aab5a0d552f5670a3978c7cd22');
-        $keyId     = $request->filled('cio_finance_key_id') ? $request->cio_finance_key_id : ($setting->cio_finance_key_id ?? 'kid_4e0479ba4b715ac5');
-        $secretKey = $request->filled('cio_finance_secret_key') ? $request->cio_finance_secret_key : ($setting->cio_finance_secret_key ?? 'b60777bc6d6569ad65f875e81f824cda74b3c1cb05a188081ef974ee6c943ed7');
-        $timeout   = $request->filled('cio_finance_timeout') ? (int) $request->cio_finance_timeout : ($setting->cio_finance_timeout ?? 30);
 
         Setting::updateOrCreate(
             ['id' => $request->id ?? 1],
             [
-                "telp"                   => $telp,
-                "notification_channel"   => $notificationChannel,
-                "admin_fee"              => $adminFee,
-                "cio_finance_base_url"   => $baseUrl,
-                "cio_finance_client_id"  => $clientId,
-                "cio_finance_key_id"     => $keyId,
-                "cio_finance_secret_key" => $secretKey,
-                "cio_finance_timeout"    => $timeout,
-                "xendit_secret_key"      => $request->xendit_secret_key ?? ($setting->xendit_secret_key ?? null),
-                "xendit_webhook_token"   => $request->xendit_webhook_token ?? ($setting->xendit_webhook_token ?? null),
+                "telp"                 => $telp,
+                "notification_channel" => $notificationChannel,
+                "fonnte_token"         => $fonnteToken,
+                "target_wa_kas"        => $targetWaKas,
+                "admin_fee"            => $adminFee,
             ]
         );
 
         return back()->with('success', 'Berhasil memperbarui pengaturan sistem.');
+    }
+
+    public function testFonnte(Request $request, FonnteService $fonnteService)
+    {
+        $request->validate([
+            'target' => 'required|string',
+        ]);
+
+        $result = $fonnteService->testConnection($request->target);
+
+        if ($result['status']) {
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Pesan uji coba WhatsApp berhasil dikirim ke ' . $request->target . ' via Fonnte!',
+            ]);
+        }
+
+        return response()->json([
+            'status'  => 'error',
+            'message' => $result['message'],
+        ], 400);
     }
 
     public function saveDashboardColumns(Request $request)

@@ -2,14 +2,10 @@
 
 @section('title', 'Portofolio Saham Saya')
 @section('pretitle', 'INVESTOR PORTAL')
-@section('subtitle', 'Ringkasan Kepemilikan Saham & Kinerja Finansial Realtime')
+@section('subtitle', 'Ringkasan Kepemilikan Saham & Instrumen Portofolio Saham')
 
 @section('actions')
     <div class="d-none d-md-flex align-items-center gap-2">
-        <button type="button" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5" onclick="if(window.refreshFinanceChart) { window.refreshFinanceChart(); } else { window.location.reload(); }">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
-            <span>Segarkan Data</span>
-        </button>
         <span class="badge bg-success-lt text-success fw-bold d-inline-flex align-items-center gap-1 py-1.5 px-2.5">
             <span class="pulse-live-dot" style="width: 6px; height: 6px;"></span> Investor Terverifikasi
         </span>
@@ -32,11 +28,9 @@
                     </span>
                     <button type="button" class="android-wallet-eye-btn" id="toggle-balance-btn" onclick="toggleWalletBalance()" title="Sembunyikan/Tampilkan Nilai">
                         <span id="eye-icon-open">
-                            {{-- Tabler: eye --}}
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
                         </span>
                         <span id="eye-icon-closed" class="d-none">
-                            {{-- Tabler: eye-off --}}
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.792 1.32 -1.733 2.43 -2.82 3.329" /><path d="M3 3l18 18" /></svg>
                         </span>
                     </button>
@@ -58,19 +52,10 @@
                     </span>
                 </div>
 
-                {{-- 3 Quick Action Buttons with Smooth Scroll --}}
+                {{-- Quick Action Buttons --}}
                 <div class="android-quick-actions">
-                    <button type="button" class="android-action-item border-0 bg-transparent" data-scroll-to="chart" onclick="scrollToQuickSection('chart', event);">
-                        <div class="android-action-icon">
-                            {{-- Tabler: chart-line --}}
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19l16 0" /><path d="M4 15l4 -6l4 2l4 -5l4 4" /></svg>
-                        </div>
-                        <span>Grafik</span>
-                    </button>
-
                     <button type="button" class="android-action-item border-0 bg-transparent" data-scroll-to="saham" onclick="scrollToQuickSection('saham', event);">
                         <div class="android-action-icon">
-                            {{-- Tabler: file-certificate --}}
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 8v-3a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5" /><path d="M6 14m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M4.5 17l-1.5 5l3 -1.5l3 1.5l-1.5 -5" /></svg>
                         </div>
                         <span>Saham</span>
@@ -78,7 +63,6 @@
 
                     <button type="button" class="android-action-item border-0 bg-transparent" data-scroll-to="profil" onclick="scrollToQuickSection('profil', event);">
                         <div class="android-action-icon">
-                            {{-- Tabler: id --}}
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v10a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" /><path d="M9 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M15 8l2 0" /><path d="M15 12l2 0" /><path d="M7 16l10 0" /></svg>
                         </div>
                         <span>Profil</span>
@@ -90,27 +74,18 @@
         {{-- 2. Insight Chips Bar --}}
         <div class="android-insight-chips-bar">
             <div class="android-insight-chip">
-                {{-- Tabler: diamond --}}
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5h12l3 5l-8.5 9.5a.7 .7 0 0 1 -1 0l-8.5 -9.5l3 -5" /><path d="M10 12l-2 -2.2l.6 -1" /></svg>
                 <span>Modal: <strong>Rp {{ number_format($totalInvestment, 0, ',', '.') }}</strong></span>
             </div>
             <div class="android-insight-chip">
-                {{-- Tabler: chart-pie --}}
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-6.8a1 1 0 0 0 -1 -1" /><path d="M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5" /></svg>
                 <span>Porsi: <strong>{{ number_format($totalPercentage, 2) }}%</strong></span>
             </div>
             <div class="android-insight-chip">
-                {{-- Tabler: coin --}}
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M14.8 9a2 2 0 0 0 -1.8 -1h-2a2 2 0 1 0 0 4h2a2 2 0 1 1 0 4h-2a2 2 0 0 1 -1.8 -1" /><path d="M12 7v10" /></svg>
-                <span>Net Profit: <strong>Rp {{ number_format($chartData['summary']['net_profit'] ?? 0, 0, ',', '.') }}</strong></span>
-            </div>
-            <div class="android-insight-chip">
-                {{-- Tabler: briefcase --}}
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M8 7v-2a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v2" /><path d="M12 12l0 .01" /><path d="M3 13a20 20 0 0 0 18 0" /></svg>
                 <span>Portofolio: <strong>{{ $portfoliosCount }} Saham</strong></span>
             </div>
             <div class="android-insight-chip">
-                {{-- Tabler: shield-check --}}
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.46 20.846a12 12 0 0 1 -7.96 -14.846a12 12 0 0 0 8.5 -3a12 12 0 0 0 8.5 3a12 12 0 0 1 -.09 7.06" /><path d="M15 19l2 2l4 -4" /></svg>
                 <span>Status: <strong>Terverifikasi Aktif</strong></span>
             </div>
@@ -123,7 +98,6 @@
                 <div class="android-metric-header">
                     <span class="android-metric-title">Lembar Saham</span>
                     <span class="android-metric-mini-icon bg-blue-lt text-primary">
-                        {{-- Tabler: file-stack --}}
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" /><path d="M5 21h14" /><path d="M5 18h14" /><path d="M5 15h14" /></svg>
                     </span>
                 </div>
@@ -140,7 +114,6 @@
                 <div class="android-metric-header">
                     <span class="android-metric-title">Porsi Kepemilikan</span>
                     <span class="android-metric-mini-icon bg-success-lt text-success">
-                        {{-- Tabler: chart-pie --}}
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-6.8a1 1 0 0 0 -1 -1" /><path d="M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5" /></svg>
                     </span>
                 </div>
@@ -157,7 +130,6 @@
                 <div class="android-metric-header">
                     <span class="android-metric-title">Portofolio Saham</span>
                     <span class="android-metric-mini-icon bg-warning-lt text-warning">
-                        {{-- Tabler: award --}}
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9m-6 0a6 6 0 1 0 12 0a6 6 0 1 0 -12 0" /><path d="M12 15l3.4 5.89l1.598 -3.233l3.6 .232l-3.4 -5.889" /><path d="M6.802 12l-3.4 5.89l3.598 .232l1.6 3.233l3.4 -5.889" /></svg>
                     </span>
                 </div>
@@ -176,12 +148,12 @@
          ===================================================================== --}}
     <div class="d-none d-md-block">
         {{-- 1. Executive Investor Hero Banner --}}
-        <div class="investor-hero-card">
+        <div class="investor-hero-card mb-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0369a1 100%); border-radius: 16px; padding: 2rem; color: #fff;">
             <div class="row align-items-center g-4">
                 <div class="col-lg-7">
                     {{-- Identity Section --}}
                     <div class="d-flex align-items-center gap-3 mb-3">
-                        <div class="investor-avatar-circle">
+                        <div class="investor-avatar-circle" style="width: 54px; height: 54px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.25rem;">
                             {{ strtoupper(substr($shareholder->name ?? $user->name, 0, 2)) }}
                         </div>
                         <div>
@@ -200,33 +172,29 @@
                         </div>
                     </div>
 
-                    {{-- Profile Data Grid (2 columns, neat) --}}
-                    <div class="investor-profile-grid">
-                        <div class="investor-profile-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v10a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" /><path d="M9 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M15 8l2 0" /><path d="M15 12l2 0" /><path d="M7 16l10 0" /></svg>
-                            <span class="investor-profile-label">NIK</span>
-                            <span class="investor-profile-value font-monospace">{{ $shareholder->id_card_number ?? '-' }}</span>
+                    {{-- Profile Data Grid --}}
+                    <div class="investor-profile-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+                        <div class="investor-profile-item d-flex align-items-center gap-2">
+                            <span class="investor-profile-label text-white-50 small">NIK:</span>
+                            <span class="investor-profile-value font-monospace fw-bold">{{ $shareholder->id_card_number ?? '-' }}</span>
                         </div>
-                        <div class="investor-profile-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" /></svg>
-                            <span class="investor-profile-label">Telepon</span>
-                            <span class="investor-profile-value font-monospace">{{ $shareholder->phone ?? $user->phone ?? '-' }}</span>
+                        <div class="investor-profile-item d-flex align-items-center gap-2">
+                            <span class="investor-profile-label text-white-50 small">Telepon:</span>
+                            <span class="investor-profile-value font-monospace fw-bold">{{ $shareholder->phone ?? $user->phone ?? '-' }}</span>
                         </div>
-                        <div class="investor-profile-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" /><path d="M3 7l9 6l9 -6" /></svg>
-                            <span class="investor-profile-label">Email</span>
-                            <span class="investor-profile-value">{{ $shareholder->email ?? $user->email }}</span>
+                        <div class="investor-profile-item d-flex align-items-center gap-2">
+                            <span class="investor-profile-label text-white-50 small">Email:</span>
+                            <span class="investor-profile-value fw-bold">{{ $shareholder->email ?? $user->email }}</span>
                         </div>
-                        <div class="investor-profile-item">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" /><path d="M16 3v4" /><path d="M8 3v4" /><path d="M4 11h16" /><path d="M11 15h1" /><path d="M12 15v3" /></svg>
-                            <span class="investor-profile-label">Bergabung</span>
-                            <span class="investor-profile-value">{{ $shareholder && $shareholder->created_at ? $shareholder->created_at->format('d M Y') : '-' }}</span>
+                        <div class="investor-profile-item d-flex align-items-center gap-2">
+                            <span class="investor-profile-label text-white-50 small">Bergabung:</span>
+                            <span class="investor-profile-value fw-bold">{{ $shareholder && $shareholder->created_at ? $shareholder->created_at->format('d M Y') : '-' }}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-5">
-                    <div class="investor-glass-box text-white">
+                    <div class="investor-glass-box text-white p-3.5 rounded-3" style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15);">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="text-uppercase tracking-wider fw-bold text-white-50" style="font-size: 0.72rem; letter-spacing: 0.05em;">
                                 TOTAL MODAL INVESTASI SAYA
@@ -247,13 +215,11 @@
                         <div class="d-flex flex-column gap-1.5">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="badge bg-white text-primary font-monospace fw-bold px-2 py-1 d-inline-flex align-items-center gap-1" style="font-size: 0.72rem;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-6.8a1 1 0 0 0 -1 -1" /><path d="M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5" /></svg>
                                     Porsi Kepemilikan: {{ number_format($totalPercentage, 2) }}%
                                 </span>
                             </div>
                             <div class="d-flex align-items-center gap-2 flex-wrap">
                                 <span class="badge bg-white-lt text-white font-monospace px-2 py-1 d-inline-flex align-items-center gap-1" style="font-size: 0.72rem; background: rgba(255,255,255,0.12) !important;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" /><path d="M5 21h14" /><path d="M5 18h14" /><path d="M5 15h14" /></svg>
                                     {{ number_format($totalShares, 0, ',', '.') }} Lembar Saham
                                 </span>
                             </div>
@@ -270,7 +236,6 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted small fw-bold text-uppercase">Modal Disetor</span>
                         <span class="avatar avatar-sm bg-primary-lt text-primary rounded-circle">
-                            {{-- Tabler: wallet --}}
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /></svg>
                         </span>
                     </div>
@@ -286,7 +251,6 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted small fw-bold text-uppercase">Total Lembar Saham</span>
                         <span class="avatar avatar-sm bg-azure-lt text-azure rounded-circle">
-                            {{-- Tabler: file-stack --}}
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" /><path d="M5 21h14" /><path d="M5 18h14" /><path d="M5 15h14" /></svg>
                         </span>
                     </div>
@@ -302,7 +266,6 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="text-muted small fw-bold text-uppercase">Porsi Kepemilikan</span>
                         <span class="avatar avatar-sm bg-success-lt text-success rounded-circle">
-                            {{-- Tabler: chart-pie --}}
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-6.8a1 1 0 0 0 -1 -1" /><path d="M15 3.5a9 9 0 0 1 5.5 5.5h-4.5a1 1 0 0 1 -1 -1v-4.5" /></svg>
                         </span>
                     </div>
@@ -316,33 +279,13 @@
     </div>
 
     {{-- =====================================================================
-         C. SHARED REALTIME FINANCE CHART & TRANSACTION LOGS (Adaptive for Mobile & Desktop)
-         ===================================================================== --}}
-    <div id="realtime-chart" class="mb-4 scroll-anchor-target">
-        @include('components.finance-log-chart', [
-            'chartData' => $chartData,
-            'timeframe' => $timeframe,
-            'webFilter' => $webFilter,
-            'title' => 'Grafik Kinerja Finansial (Income, Outcome & Keuntungan)',
-            'subtitle' => 'Visualisasi realtime arus kas masuk (Income), pengeluaran (Outcome), dan Keuntungan Bersih (Net Profit) konsolidasi usaha.'
-        ])
-
-        {{-- 2-Tab Riwayat Log Transaksi (Web Internal & Gateway Xendit) --}}
-        @include('components.finance-log-table', [
-            'logs' => $recentLogs,
-            'webFilter' => $webFilter,
-        ])
-    </div>
-
-    {{-- =====================================================================
-         D. MOBILE DETAILS & HOLDINGS (Mobile Only: < 768px)
+         C. MOBILE DETAILS & HOLDINGS (Mobile Only: < 768px)
          ===================================================================== --}}
     <div class="android-dashboard-view d-md-none">
-        {{-- 5. Rincian Portofolio Saham --}}
+        {{-- Rincian Portofolio Saham --}}
         <div id="mobile-my-holdings" class="mt-2 scroll-anchor-target">
             <div class="d-flex justify-content-between align-items-center mb-2 px-1">
                 <div class="fw-bold text-dark fs-3 d-flex align-items-center gap-1.5">
-                    {{-- Tabler: file-certificate --}}
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M5 8v-3a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-5" /><path d="M6 14m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M4.5 17l-1.5 5l3 -1.5l3 1.5l-1.5 -5" /></svg>
                     <span>Instrumen Saham Saya</span>
                 </div>
@@ -383,7 +326,6 @@
                             @if($holding->certificate_number)
                                 <div class="mt-2.5 pt-2 border-top d-flex justify-content-between align-items-center">
                                     <span class="small text-muted font-monospace d-inline-flex align-items-center gap-1">
-                                        {{-- Tabler: certificate --}}
                                         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 15m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M13 17.5v4.5l2 -1.5l2 1.5v-4.5" /><path d="M10 19h-5a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -1 1.73" /><path d="M6 9l12 0" /><path d="M6 12l3 0" /><path d="M6 15l2 0" /></svg>
                                         {{ $holding->certificate_number }}
                                     </span>
@@ -400,11 +342,10 @@
             @endif
         </div>
 
-        {{-- 6. Identitas & Legalitas --}}
+        {{-- Identitas & Legalitas --}}
         <div id="my-profile" class="card border shadow-sm p-3 bg-white mb-3 scroll-anchor-target" style="border-radius: 16px;">
             <div class="d-flex align-items-center gap-2 mb-3">
                 <div class="avatar bg-blue-lt text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
-                    {{-- Tabler: user-circle --}}
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855" /></svg>
                 </div>
                 <div>
@@ -440,15 +381,14 @@
     </div>
 
     {{-- =====================================================================
-         E. DESKTOP DETAILS & TABLE (Desktop Only: >= 768px)
+         D. DESKTOP DETAILS & TABLE (Desktop Only: >= 768px)
          ===================================================================== --}}
     <div class="d-none d-md-block">
-        {{-- 4. Tabel Portofolio Saham --}}
+        {{-- Tabel Portofolio Saham --}}
         <div id="my-holdings" class="card border shadow-sm mb-4 scroll-anchor-target">
             <div class="card-header d-flex justify-content-between align-items-center py-3 bg-white">
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-primary text-white p-1.5 rounded-circle">
-                        {{-- Tabler: certificate --}}
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 15m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /><path d="M13 17.5v4.5l2 -1.5l2 1.5v-4.5" /><path d="M10 19h-5a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -1 1.73" /><path d="M6 9l12 0" /><path d="M6 12l3 0" /><path d="M6 15l2 0" /></svg>
                     </span>
                     <h3 class="card-title fw-bold mb-0 text-dark">Rincian Kepemilikan Instrumen Saham</h3>
@@ -514,13 +454,12 @@
             </div>
         </div>
 
-        {{-- 5. Identitas & Legalitas --}}
+        {{-- Identitas & Legalitas --}}
         <div class="row row-cards mb-4">
             <div class="col-12">
                 <div id="desktop-my-profile" class="card border shadow-sm scroll-anchor-target">
                     <div class="card-header py-3 bg-white d-flex align-items-center gap-2">
                         <span class="badge bg-azure-lt p-1.5 rounded-circle">
-                            {{-- Tabler: id --}}
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v10a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" /><path d="M9 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M15 8l2 0" /><path d="M15 12l2 0" /><path d="M7 16l10 0" /></svg>
                         </span>
                         <h3 class="card-title fw-bold text-dark mb-0">Identitas & Legalitas Pemegang Saham</h3>
@@ -566,9 +505,7 @@
         }
         
         var target = null;
-        if (section === 'chart' || section === 'grafik') {
-            target = document.getElementById('realtime-chart');
-        } else if (section === 'holdings' || section === 'saham') {
+        if (section === 'holdings' || section === 'saham') {
             var mobH = document.getElementById('mobile-my-holdings');
             var dskH = document.getElementById('my-holdings');
             if (mobH && mobH.offsetParent !== null) {
@@ -589,10 +526,7 @@
         }
         
         if (target) {
-            // 1. Native scrollIntoView
             target.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-            
-            // 2. Direct offset window scroll fallback (handling sticky headers)
             var isMobile = window.innerWidth < 768;
             var headerOffset = isMobile ? 65 : 85;
             var scrollY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;

@@ -8,7 +8,7 @@
                 Pemilik ini memiliki <strong>{{ $shareholder->holdings->count() }}</strong> instrumen saham terdaftar.
             </span>
         </div>
-        @can('create-share-holding')
+        @can('tambah kepemilikan saham')
             <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-add-holding">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
                 + Tambah Saham untuk Pemilik Ini
@@ -23,7 +23,7 @@
             </div>
             <h4 class="text-dark">Belum Ada Data Saham</h4>
             <p class="text-muted small">Pemilik saham ini belum memiliki instrumen alokasi saham terdaftar.</p>
-            @can('create-share-holding')
+            @can('tambah kepemilikan saham')
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-add-holding">
                     + Tambahkan Saham Sekarang
                 </button>
@@ -87,12 +87,12 @@
                             </td>
                             <td class="text-end">
                                 <div class="btn-group">
-                                    @can('edit-share-holding')
+                                    @can('ubah kepemilikan saham')
                                         <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal-edit-holding-{{ $holding->id }}">
                                             Edit
                                         </button>
                                     @endcan
-                                    @can('delete-share-holding')
+                                    @can('hapus kepemilikan saham')
                                         <form action="{{ route('share-holdings.destroy', $holding->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data saham {{ $holding->share_code }} ini?');">
                                             @csrf
                                             @method('DELETE')

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\InvestmentReport;
 use App\Models\Shareholder;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class InvestmentReportController extends Controller
 {
@@ -15,7 +16,7 @@ class InvestmentReportController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $isAdmin = $user->can('create-investment-report');
+        $isAdmin = $user && ($user->can('tambah laporan imbal hasil') || $user->can('ubah laporan imbal hasil'));
 
         $query = InvestmentReport::with('shareholder')
             ->orderBy('year', 'desc')
@@ -40,30 +41,92 @@ class InvestmentReportController extends Controller
             }
         }
 
-        // Filter untuk Admin
-        if ($isAdmin) {
-            if ($request->filled('shareholder_id')) {
-                $query->where('shareholder_id', $request->shareholder_id);
-            }
+        if ($request->ajax()) {
+            return DataTables::eloquent($query)
+                ->filter(function ($q) use ($request, $isAdmin) {
+                    if ($isAdmin && $request->filled('shareholder_id')) {
+                        $q->where('shareholder_id', $request->shareholder_id);
+                    }
 
-            if ($request->filled('search')) {
-                $search = trim($request->search);
-                $query->whereHas('shareholder', function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
-                });
-            }
+                    if ($request->filled('year')) {
+                        $q->where('year', $request->year);
+                    }
+
+                    if ($request->filled('status')) {
+                        $q->where('status', $request->status);
+                    }
+
+                    if ($request->has('search') && !empty($request->input('search.value'))) {
+                        $search = trim($request->input('search.value'));
+                        $q->where(function ($sub) use ($search) {
+                            $sub->where('year', 'like', "%{$search}%")
+                                ->orWhere('notes', 'like', "%{$search}%")
+                                ->orWhereHas('shareholder', function ($shq) use ($search) {
+                                    $shq->where('name', 'like', "%{$search}%")
+                                        ->orWhere('email', 'like', "%{$search}%");
+                                });
+                        });
+                    }
+                })
+                ->addColumn('year_badge', function ($rep) {
+                    return '<span class="badge bg-blue-lt font-monospace fw-bold px-2 py-1">' . $rep->year . '</span>';
+                })
+                ->addColumn('shareholder_info', function ($rep) {
+                    $name = $rep->shareholder ? e($rep->shareholder->name) : '-';
+                    $initials = $rep->shareholder ? strtoupper(substr($rep->shareholder->name, 0, 2)) : 'PS';
+                    $email = ($rep->shareholder && $rep->shareholder->email) ? '<span class="text-muted small d-block text-truncate" style="font-size: 0.75rem;">' . e($rep->shareholder->email) . '</span>' : '';
+
+                    return '<div class="d-flex align-items-center gap-2">
+                                <div class="shareholder-avatar-circle" style="width: 34px; height: 34px; font-size: 0.8rem;">
+                                    ' . $initials . '
+                                </div>
+                                <div class="overflow-hidden">
+                                    <strong class="text-dark d-block text-truncate">' . $name . '</strong>
+                                    ' . $email . '
+                                </div>
+                            </div>';
+                })
+                ->addColumn('initial_capital_formatted', function ($rep) {
+                    return '<div class="text-end fw-bold font-monospace text-dark">Rp ' . number_format($rep->initial_capital, 0, ',', '.') . '</div>';
+                })
+                ->addColumn('profit_amount_formatted', function ($rep) {
+                    return '<div class="text-end fw-bold font-monospace text-success">+ Rp ' . number_format($rep->profit_amount, 0, ',', '.') . '</div>';
+                })
+                ->addColumn('status_badge', function ($rep) {
+                    if ($rep->status === 'distributed') {
+                        return '<div class="text-center"><span class="badge bg-success-lt text-success fw-bold px-2 py-1">Dibagikan</span></div>';
+                    } elseif ($rep->status === 'reinvested') {
+                        return '<div class="text-center"><span class="badge bg-purple-lt text-purple fw-bold px-2 py-1">Direinvestasi</span></div>';
+                    }
+                    return '<div class="text-center"><span class="badge bg-warning-lt text-warning fw-bold px-2 py-1">Tertunda</span></div>';
+                })
+                ->addColumn('notes_formatted', function ($rep) {
+                    return '<span class="text-muted small">' . e($rep->notes ?: '-') . '</span>';
+                })
+                ->addColumn('action', function ($rep) use ($user) {
+                    $btnEdit = '';
+                    if ($user && $user->can('ubah laporan imbal hasil')) {
+                        $btnEdit = '<button type="button" class="btn btn-sm btn-outline-secondary btn-edit-report" data-id="' . $rep->id . '" title="Edit Laporan">
+                                        Edit
+                                    </button>';
+                    }
+
+                    $btnDelete = '';
+                    if ($user && $user->can('hapus laporan imbal hasil')) {
+                        $btnDelete = '<button type="button" class="btn btn-sm btn-outline-danger btn-delete-report" data-id="' . $rep->id . '" data-year="' . $rep->year . '" data-name="' . e($rep->shareholder->name ?? 'investor') . '" title="Hapus Laporan">
+                                        Hapus
+                                    </button>';
+                    }
+
+                    if (!$btnEdit && !$btnDelete) {
+                        return '';
+                    }
+
+                    return '<div class="text-end"><div class="btn-group">' . $btnEdit . $btnDelete . '</div></div>';
+                })
+                ->rawColumns(['year_badge', 'shareholder_info', 'initial_capital_formatted', 'profit_amount_formatted', 'status_badge', 'notes_formatted', 'action'])
+                ->make(true);
         }
-
-        if ($request->filled('year')) {
-            $query->where('year', $request->year);
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        $reports = $query->paginate(15)->withQueryString();
 
         // Metrik Ringkasan
         if ($isAdmin) {
@@ -83,7 +146,6 @@ class InvestmentReportController extends Controller
         $availableYears = InvestmentReport::select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
 
         return view('pages.investment-reports.index', compact(
-            'reports',
             'isAdmin',
             'currentShareholder',
             'totalCapital',
@@ -92,6 +154,28 @@ class InvestmentReportController extends Controller
             'allShareholders',
             'availableYears'
         ));
+    }
+
+    /**
+     * Detail 1 laporan untuk modal AJAX.
+     */
+    public function show(Request $request, $id)
+    {
+        $report = InvestmentReport::with('shareholder')->findOrFail($id);
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => [
+                'id'                 => $report->id,
+                'shareholder_id'     => $report->shareholder_id,
+                'year'               => $report->year,
+                'initial_capital'    => number_format($report->initial_capital, 0, ',', '.'),
+                'profit_amount'      => number_format($report->profit_amount, 0, ',', '.'),
+                'status'             => $report->status,
+                'notes'              => $report->notes,
+                'update_url'         => route('investment-reports.update', $report->id),
+            ]
+        ]);
     }
 
     /**
@@ -184,12 +268,21 @@ class InvestmentReportController extends Controller
     /**
      * Hapus laporan keuntungan saham (Admin Only).
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $report = InvestmentReport::findOrFail($id);
         $report->delete();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'code'    => 200,
+                'status'  => 'success',
+                'message' => 'Laporan keuntungan saham tahunan berhasil dihapus.'
+            ]);
+        }
 
         return redirect()->route('investment-reports.index')
             ->with('success', 'Laporan keuntungan saham tahunan berhasil dihapus.');
     }
 }
+

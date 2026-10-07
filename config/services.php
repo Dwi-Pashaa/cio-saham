@@ -51,5 +51,10 @@ return [
         'timeout'    => (int) env('CIO_FINANCE_TIMEOUT', 30),
     ],
 
+    'fonnte' => [
+        'token'    => env('FONNTE_TOKEN'),
+        'endpoint' => env('FONNTE_ENDPOINT', 'https://api.fonnte.com/send'),
+    ],
+
 ];
 

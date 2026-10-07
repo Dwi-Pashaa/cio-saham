@@ -448,6 +448,32 @@ header.navbar-expand-md .navbar {
   box-shadow: 0 3px 6px rgba(8, 145, 178, 0.25) !important;
 }
 
+.btn-action-purple {
+  background-color: #f3e8ff !important;
+  color: #7e22ce !important;
+  border-color: #e9d5ff !important;
+}
+
+.btn-action-purple:hover {
+  background-color: #7e22ce !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(126, 34, 206, 0.25) !important;
+}
+
+.btn-action-info {
+  background-color: #eff6ff !important;
+  color: #2563eb !important;
+  border-color: #bfdbfe !important;
+}
+
+.btn-action-info:hover {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(37, 99, 235, 0.25) !important;
+}
+
 /* Soft Badges */
 .badge-soft-primary {
   background-color: #eff6ff !important;

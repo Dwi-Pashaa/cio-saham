@@ -12,6 +12,8 @@ class Setting extends Model
     protected $fillable = [
         'telp', 
         'notification_channel', 
+        'fonnte_token',
+        'target_wa_kas',
         'admin_fee', 
         'cio_finance_base_url',
         'cio_finance_client_id',

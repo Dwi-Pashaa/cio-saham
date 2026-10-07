@@ -90,169 +90,89 @@
         <div class="d-flex align-items-center gap-2">
             <span class="pulse-live-dot"></span>
             <h3 class="card-title fw-bold mb-0 text-dark">Direktori Pemegang Saham</h3>
-            <span class="badge bg-blue-lt fw-bold">{{ $shareholders->total() }} Investor</span>
+            <span class="badge bg-blue-lt fw-bold">Server-Side DataTables</span>
         </div>
 
-        <!-- Search & Filter Form (Responsive & Neat) -->
-        <form action="{{ route('investor-directory.index') }}" method="GET" class="d-flex flex-wrap align-items-center gap-2 m-0" id="filter-investor-form">
+        <!-- Search & Filter Controls -->
+        <div class="d-flex flex-wrap align-items-center gap-2 m-0">
             <div class="input-icon">
                 <span class="input-icon-addon text-muted">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
                 </span>
-                <input type="text" name="search" class="form-control form-control-sm" placeholder="Cari nama pemegang saham..." value="{{ request('search') }}" style="min-width: 220px;">
+                <input type="text" id="filter_search" class="form-control form-control-sm" placeholder="Cari nama, email, kode saham..." style="min-width: 220px;">
             </div>
-            <div style="min-width: 140px;">
-                <select name="status" class="form-select form-select-sm tom-select-filter">
-                    <option value="">Semua Status</option>
-                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Aktif</option>
-                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Non-Aktif</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
-                <span>Cari</span>
+            <select id="filter_status" class="form-select form-select-sm" style="width: auto; min-width: 140px;">
+                <option value="">Semua Status</option>
+                <option value="active">Aktif</option>
+                <option value="inactive">Non-Aktif</option>
+            </select>
+            <button type="button" id="btn-reset-filter" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1" title="Reset filter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
+                <span>Reset</span>
             </button>
-            @if(request('search') || request('status'))
-                <a href="{{ route('investor-directory.index') }}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center gap-1" title="Reset filter">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
-                    <span>Reset</span>
-                </a>
-            @endif
-        </form>
+        </div>
     </div>
 
-    @if($shareholders->isEmpty())
-        <div class="card-body text-center py-5 bg-white">
-            <div class="text-muted mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-x text-muted opacity-50" width="56" height="56" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" /><path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" /><path d="M22 22l-5 -5" /><path d="M17 22l5 -5" /></svg>
-            </div>
-            <h4 class="text-dark fw-bold">Data Pemegang Saham Tidak Ditemukan</h4>
-            <p class="text-muted small" style="max-width: 420px; margin: 0 auto 1.25rem;">
-                Tidak ada data pemegang saham yang sesuai dengan kata kunci pencarian Anda.
-            </p>
-            <a href="{{ route('investor-directory.index') }}" class="btn btn-outline-secondary btn-sm">
-                Lihat Semua Investor
-            </a>
-        </div>
-    @else
-        <div class="table-responsive">
-            <table class="table table-vcenter card-table table-hover shareholder-table">
-                <thead>
-                    <tr>
-                        <th style="min-width: 240px;">Pemegang Saham</th>
-                        <th class="text-center" style="min-width: 140px;">Instrumen Saham</th>
-                        <th class="text-end" style="min-width: 150px;">Total Lembar</th>
-                        <th class="text-end" style="min-width: 170px;">Total Investasi</th>
-                        <th class="text-center" style="min-width: 130px;">Porsi Kepemilikan (%)</th>
-                        <th class="text-center" style="min-width: 110px;">Status</th>
-                        <th class="text-end" style="min-width: 160px;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($shareholders as $sh)
-                        <tr>
-                            <!-- Pemegang Saham: Avatar + Name + Email -->
-                            <td>
-                                <div class="d-flex align-items-center gap-2.5">
-                                    <div class="shareholder-avatar-circle" style="width: 38px; height: 38px; font-size: 0.9rem;">
-                                        {{ strtoupper(substr($sh->name, 0, 2)) }}
-                                    </div>
-                                    <div class="overflow-hidden">
-                                        <a href="{{ route('investor-directory.show', $sh->id) }}" class="text-dark fw-bold d-block text-decoration-none hover-primary text-truncate" title="{{ $sh->name }}">
-                                            {{ $sh->name }}
-                                        </a>
-                                        @if($sh->email)
-                                            <span class="text-muted small d-block text-truncate" style="font-size: 0.775rem;">{{ $sh->email }}</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            </td>
-
-                            <!-- Instrumen Saham -->
-                            <td class="text-center">
-                                <span class="badge bg-purple-lt fw-bold d-inline-flex align-items-center gap-1 font-monospace px-2.5 py-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 7m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" /><path d="M8 7v-2a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v2" /></svg>
-                                    <span>{{ $sh->activeHoldings->count() }} Saham</span>
-                                </span>
-                            </td>
-
-                            <!-- Total Lembar -->
-                            <td class="text-end fw-bold font-monospace" style="white-space: nowrap !important;">
-                                <span class="text-dark fs-4">{{ number_format($sh->total_shares, 0, ',', '.') }}</span>
-                                <span class="small text-muted fw-normal">Lembar</span>
-                            </td>
-
-                            <!-- Total Investasi -->
-                            <td class="text-end fw-bold font-monospace" style="white-space: nowrap !important;">
-                                <span class="text-primary fs-4">Rp {{ number_format($sh->total_investment, 0, ',', '.') }}</span>
-                            </td>
-
-                            <!-- Total Porsi (%) -->
-                            <td class="text-center">
-                                <span class="badge bg-success-lt fw-bold font-monospace px-2.5 py-1" style="font-size: 0.85rem;">
-                                    {{ number_format($sh->total_percentage, 2) }}%
-                                </span>
-                            </td>
-
-                            <!-- Status -->
-                            <td class="text-center">
-                                @if($sh->status === 'active')
-                                    <span class="badge bg-success-lt text-success fw-bold d-inline-flex align-items-center gap-1 px-2 py-1">
-                                        <span class="pulse-live-dot" style="width: 6px; height: 6px;"></span>
-                                        <span>Aktif</span>
-                                    </span>
-                                @else
-                                    <span class="badge bg-danger-lt text-danger fw-bold px-2 py-1">
-                                        Non-Aktif
-                                    </span>
-                                @endif
-                            </td>
-
-                            <!-- Aksi (Read-Only Detail) -->
-                            <td class="text-end">
-                                <a href="{{ route('investor-directory.show', $sh->id) }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1.5 shadow-sm" title="Lihat Portofolio Saham">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
-                                    <span>Lihat Portofolio</span>
-                                </a>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Pagination -->
-        @if($shareholders->hasPages())
-            <div class="card-footer d-flex align-items-center justify-content-between bg-white py-3 border-top">
-                <p class="m-0 text-muted small">
-                    Menampilkan <span>{{ $shareholders->firstItem() }}</span> hingga <span>{{ $shareholders->lastItem() }}</span> dari <span>{{ $shareholders->total() }}</span> pemegang saham
-                </p>
-                <div class="m-0">
-                    {{ $shareholders->links() }}
-                </div>
-            </div>
-        @endif
-    @endif
+    <div class="table-responsive p-3">
+        <table id="table-investor-directory" class="table table-vcenter card-table table-hover shareholder-table w-100">
+            <thead>
+                <tr>
+                    <th style="min-width: 240px;">Pemegang Saham</th>
+                    <th class="text-center" style="min-width: 140px;">Instrumen Saham</th>
+                    <th class="text-end" style="min-width: 150px;">Total Lembar</th>
+                    <th class="text-end" style="min-width: 170px;">Total Investasi</th>
+                    <th class="text-center" style="min-width: 130px;">Porsi Kepemilikan (%)</th>
+                    <th class="text-center" style="min-width: 110px;">Status</th>
+                    <th class="text-end" style="min-width: 160px;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
 </div>
+@endsection
 
 @push('js')
-<script src="{{ asset('libs/tom-select/dist/js/tom-select.complete.min.js') }}"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll('.tom-select-filter').forEach(function (el) {
-            if (!el.tomselect) {
-                new TomSelect(el, {
-                    create: false,
-                    copyClassesToDropdown: false,
-                    dropdownParent: 'body',
-                    onChange: function() {
-                        const form = document.getElementById('filter-investor-form');
-                        if (form) form.submit();
-                    }
-                });
-            }
+    document.addEventListener('DOMContentLoaded', function () {
+        const table = $('#table-investor-directory').DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            ajax: {
+                url: "{{ route('investor-directory.index') }}",
+                data: function (d) {
+                    d.status = $('#filter_status').val();
+                }
+            },
+            columns: [
+                { data: 'shareholder_info', name: 'name' },
+                { data: 'holdings_badge', name: 'holdings_count', orderable: false, searchable: false, className: 'text-center' },
+                { data: 'total_shares_formatted', name: 'total_shares', searchable: false, className: 'text-end' },
+                { data: 'total_investment_formatted', name: 'total_investment', searchable: false, className: 'text-end' },
+                { data: 'total_percentage_formatted', name: 'total_percentage', searchable: false, className: 'text-center' },
+                { data: 'status_badge', name: 'status', className: 'text-center' },
+                { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-end' },
+            ],
+            order: [[0, 'asc']],
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
+        });
+
+        $('#filter_status').on('change', function () {
+            table.draw();
+        });
+
+        $('#filter_search').on('keyup', function () {
+            table.search(this.value).draw();
+        });
+
+        $('#btn-reset-filter').on('click', function () {
+            $('#filter_search').val('');
+            $('#filter_status').val('');
+            table.search('').draw();
         });
     });
 </script>
 @endpush
-@endsection

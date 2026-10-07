@@ -28,16 +28,14 @@ class ShareholderManagementTest extends TestCase
     }
 
     /**
-     * Test Dashboard loads successfully with Company Growth Analytics & Multi-Web Finance Log Chart.
+     * Test Dashboard loads successfully with Total Modal Saham.
      */
-    public function test_admin_can_view_dashboard_with_growth_and_finance_chart(): void
+    public function test_admin_can_view_dashboard_with_total_modal_saham(): void
     {
         $response = $this->actingAs($this->adminUser)->get('/dashboard');
 
         $response->assertStatus(200);
-        $response->assertSee('Pertumbuhan Usaha');
-        $response->assertSee('Grafik Realtime Finansial');
-        $response->assertSee('Struktur Kepemilikan Saham');
+        $response->assertSee('Total Modal Saham');
     }
 
     /**
@@ -46,12 +44,15 @@ class ShareholderManagementTest extends TestCase
     public function test_admin_can_view_shareholders_list(): void
     {
         $response = $this->actingAs($this->adminUser)->get('/shareholders');
-
         $response->assertStatus(200);
-        $response->assertSee('Yoga Pratama');
-        $response->assertSee('Yogi Hermawan');
-        $response->assertSee('Fadil Muhammad');
-        $response->assertSee('2 Data Saham'); // Yoga has 2 shares
+        $response->assertSee('table-shareholders');
+
+        $ajaxResponse = $this->actingAs($this->adminUser)->getJson('/shareholders', ['X-Requested-With' => 'XMLHttpRequest']);
+        $ajaxResponse->assertStatus(200);
+        $ajaxResponse->assertSee('Yoga Pratama');
+        $ajaxResponse->assertSee('Yogi Hermawan');
+        $ajaxResponse->assertSee('Fadil Muhammad');
+        $ajaxResponse->assertSee('2 Data Saham');
     }
 
     /**

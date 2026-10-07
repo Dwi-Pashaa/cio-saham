@@ -1,8 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\FinanceLogApiController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Pages\AssetController;
+use App\Http\Controllers\Pages\CashIncomeController;
+use App\Http\Controllers\Pages\CashOutcomeController;
 use App\Http\Controllers\Pages\DashboardController;
 use App\Http\Controllers\Pages\InvestmentReportController;
 use App\Http\Controllers\Pages\InvestorDirectoryController;
@@ -38,109 +40,105 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->can('lihat dashboard');
+    Route::get('/dashboard/chart-data', [DashboardController::class, 'chartData'])->name('dashboard.chart-data')->can('lihat dashboard');
 
     // Profil Akun (Menu Default untuk SEMUA level akses tanpa batas permission)
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
+    // Manajemen Saldo Masuk (Pemasukan)
+    Route::prefix('cash-incomes')->name('cash-incomes.')->group(function () {
+        Route::get('/', [CashIncomeController::class, 'index'])->name('index')->can('lihat pemasukan');
+        Route::get('/create', [CashIncomeController::class, 'create'])->name('create')->can('tambah pemasukan');
+        Route::post('/store', [CashIncomeController::class, 'store'])->name('store')->can('tambah pemasukan');
+        Route::get('/{id}', [CashIncomeController::class, 'show'])->name('show')->can('lihat pemasukan');
+        Route::get('/{id}/edit', [CashIncomeController::class, 'edit'])->name('edit')->can('ubah pemasukan');
+        Route::put('/{id}', [CashIncomeController::class, 'update'])->name('update')->can('ubah pemasukan');
+        Route::delete('/{id}', [CashIncomeController::class, 'destroy'])->name('destroy')->can('hapus pemasukan');
+    });
+
+    // Manajemen Saldo Keluar (Pengeluaran)
+    Route::prefix('cash-outcomes')->name('cash-outcomes.')->group(function () {
+        Route::get('/', [CashOutcomeController::class, 'index'])->name('index')->can('lihat pengeluaran');
+        Route::get('/create', [CashOutcomeController::class, 'create'])->name('create')->can('tambah pengeluaran');
+        Route::post('/store', [CashOutcomeController::class, 'store'])->name('store')->can('tambah pengeluaran');
+        Route::get('/{id}', [CashOutcomeController::class, 'show'])->name('show')->can('lihat pengeluaran');
+        Route::get('/{id}/edit', [CashOutcomeController::class, 'edit'])->name('edit')->can('ubah pengeluaran');
+        Route::put('/{id}', [CashOutcomeController::class, 'update'])->name('update')->can('ubah pengeluaran');
+        Route::delete('/{id}', [CashOutcomeController::class, 'destroy'])->name('destroy')->can('hapus pengeluaran');
+    });
+
+    // Manajemen Aset Perusahaan & Investor
+    Route::prefix('assets')->name('assets.')->group(function () {
+        Route::get('/', [AssetController::class, 'index'])->name('index')->can('lihat aset');
+        Route::get('/create', [AssetController::class, 'create'])->name('create')->can('tambah aset');
+        Route::post('/store', [AssetController::class, 'store'])->name('store')->can('tambah aset');
+        Route::get('/{id}', [AssetController::class, 'show'])->name('show')->can('lihat aset');
+        Route::get('/{id}/edit', [AssetController::class, 'edit'])->name('edit')->can('ubah aset');
+        Route::put('/{id}', [AssetController::class, 'update'])->name('update')->can('ubah aset');
+        Route::delete('/{id}', [AssetController::class, 'destroy'])->name('destroy')->can('hapus aset');
+        Route::delete('/images/{imageId}', [AssetController::class, 'destroyImage'])->name('images.destroy')->can('ubah aset');
+    });
+
     // Manajemen Pemilik Saham (Shareholders)
     Route::prefix('shareholders')->name('shareholders.')->group(function () {
-        Route::get('/', [ShareholderController::class, 'index'])->name('index')->can('view-shareholders');
-        Route::get('/create', [ShareholderController::class, 'create'])->name('create')->can('create-shareholder');
-        Route::post('/store', [ShareholderController::class, 'store'])->name('store')->can('create-shareholder');
-        Route::get('/{id}', [ShareholderController::class, 'show'])->name('show')->can('view-shareholders');
-        Route::get('/{id}/edit', [ShareholderController::class, 'edit'])->name('edit')->can('edit-shareholder');
-        Route::put('/{id}', [ShareholderController::class, 'update'])->name('update')->can('edit-shareholder');
-        Route::delete('/{id}', [ShareholderController::class, 'destroy'])->name('destroy')->can('delete-shareholder');
+        Route::get('/', [ShareholderController::class, 'index'])->name('index')->can('lihat investor');
+        Route::get('/create', [ShareholderController::class, 'create'])->name('create')->can('tambah investor');
+        Route::post('/store', [ShareholderController::class, 'store'])->name('store')->can('tambah investor');
+        Route::get('/{id}', [ShareholderController::class, 'show'])->name('show')->can('lihat investor');
+        Route::get('/{id}/edit', [ShareholderController::class, 'edit'])->name('edit')->can('ubah investor');
+        Route::put('/{id}', [ShareholderController::class, 'update'])->name('update')->can('ubah investor');
+        Route::delete('/{id}', [ShareholderController::class, 'destroy'])->name('destroy')->can('hapus investor');
     });
 
     // Manajemen Alokasi Saham Per Pemilik (1 to Many)
     Route::prefix('share-holdings')->name('share-holdings.')->group(function () {
-        Route::post('/store', [ShareHoldingController::class, 'store'])->name('store')->can('create-share-holding');
-        Route::put('/{id}', [ShareHoldingController::class, 'update'])->name('update')->can('edit-share-holding');
-        Route::delete('/{id}', [ShareHoldingController::class, 'destroy'])->name('destroy')->can('delete-share-holding');
+        Route::post('/store', [ShareHoldingController::class, 'store'])->name('store')->can('tambah kepemilikan saham');
+        Route::put('/{id}', [ShareHoldingController::class, 'update'])->name('update')->can('ubah kepemilikan saham');
+        Route::delete('/{id}', [ShareHoldingController::class, 'destroy'])->name('destroy')->can('hapus kepemilikan saham');
     });
 
     // Direktori Portofolio Pemegang Saham (Read-Only & Search untuk Level Pemegang Saham & Admin)
     Route::prefix('investor-directory')->name('investor-directory.')->group(function () {
-        Route::get('/', [InvestorDirectoryController::class, 'index'])->name('index')->can('view-shareholder-directory');
-        Route::get('/{id}', [InvestorDirectoryController::class, 'show'])->name('show')->can('view-shareholder-directory');
+        Route::get('/', [InvestorDirectoryController::class, 'index'])->name('index')->can('lihat portofolio investor');
+        Route::get('/{id}', [InvestorDirectoryController::class, 'show'])->name('show')->can('lihat portofolio investor');
     });
 
     // Laporan Keuntungan Saham / Imbal Hasil Tahunan (CRUD Admin, Read-Only Pemegang Saham)
     Route::prefix('investment-reports')->name('investment-reports.')->group(function () {
-        Route::get('/', [InvestmentReportController::class, 'index'])->name('index')->can('view-investment-reports');
-        Route::post('/store', [InvestmentReportController::class, 'store'])->name('store')->can('create-investment-report');
-        Route::put('/{id}', [InvestmentReportController::class, 'update'])->name('update')->can('edit-investment-report');
-        Route::delete('/{id}', [InvestmentReportController::class, 'destroy'])->name('destroy')->can('delete-investment-report');
+        Route::get('/', [InvestmentReportController::class, 'index'])->name('index')->can('lihat laporan imbal hasil');
+        Route::post('/store', [InvestmentReportController::class, 'store'])->name('store')->can('tambah laporan imbal hasil');
+        Route::put('/{id}', [InvestmentReportController::class, 'update'])->name('update')->can('ubah laporan imbal hasil');
+        Route::delete('/{id}', [InvestmentReportController::class, 'destroy'])->name('destroy')->can('hapus laporan imbal hasil');
     });
 
-    // Internal API Routes untuk Finance Dashboard AJAX
-    Route::prefix('api/finance')->name('web.api.finance.')->group(function () {
-        Route::get('/overview', [FinanceLogApiController::class, 'getOverview'])->name('overview');
-        Route::get('/chart', [FinanceLogApiController::class, 'getChartData'])->name('chart');
-        Route::get('/growth', [FinanceLogApiController::class, 'getGrowthData'])->name('growth');
-        Route::get('/history', [FinanceLogApiController::class, 'getHistoryData'])->name('history');
-        Route::post('/sync', [FinanceLogApiController::class, 'syncFromFinance'])->name('sync');
+    // data role (Level Akses)
+    Route::prefix('master-data/level-akses')->name('role.')->group(function () {
+        Route::get('/', [RoleController::class, 'index'])->name('index')->can('lihat level akses');
+        Route::post('/store', [RoleController::class, 'store'])->name('store')->can('tambah level akses');
+        Route::get('/{id}/permission', [RoleController::class, 'permission'])->name('permission')->can('atur hak akses');
+        Route::put('/{id}/savePermission', [RoleController::class, 'savePermission'])->name('savePermission')->can('atur hak akses');
+        Route::get('/{id}/show', [RoleController::class, 'show'])->name('show')->can('lihat level akses');
+        Route::put('/{id}/update', [RoleController::class, 'update'])->name('update')->can('ubah level akses');
+        Route::delete('/{id}/destroy', [RoleController::class, 'destroy'])->name('destroy')->can('hapus level akses');
     });
 
-    // data role
-    Route::prefix('role')->group(function () {
-        Route::get('/', [RoleController::class, 'index'])->name('role.index')->can('lihat role');
-        Route::post('/store', [RoleController::class, 'store'])->name('role.store')->can('buat role');
-        Route::get('/{id}/permission', [RoleController::class, 'permission'])->name('role.permission')->can('ubah role');
-        Route::put('/{id}/savePermission', [RoleController::class, 'savePermission'])->name('role.savePermission')->can('ubah role');
-        Route::get('/{id}/show', [RoleController::class, 'show'])->name('role.show')->can('lihat role');
-        Route::put('/{id}/update', [RoleController::class, 'update'])->name('role.update')->can('ubah role');
-        Route::delete('/{id}/destroy', [RoleController::class, 'destroy'])->name('role.destroy')->can('hapus role');
-    });
-
-    // data users
-    Route::prefix('users')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('user.index')->can('lihat pengguna');
-        Route::get('/create', [UserController::class, 'create'])->name('user.create')->can('buat pengguna');
-        Route::post('/store', [UserController::class, 'store'])->name('user.store')->can('buat pengguna');
-        Route::get('/{id}/edit', [UserController::class, 'edit'])->name('user.edit')->can('ubah pengguna');
-        Route::put('/{id}/update', [UserController::class, 'update'])->name('user.update')->can('ubah pengguna');
-        Route::delete('/{id}/destroy', [UserController::class, 'destroy'])->name('user.destroy')->can('hapus pengguna');
+    // data users (Pengguna)
+    Route::prefix('master-data/pengguna')->name('user.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index')->can('lihat pengguna');
+        Route::get('/create', [UserController::class, 'create'])->name('create')->can('tambah pengguna');
+        Route::post('/store', [UserController::class, 'store'])->name('store')->can('tambah pengguna');
+        Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit')->can('ubah pengguna');
+        Route::put('/{id}/update', [UserController::class, 'update'])->name('update')->can('ubah pengguna');
+        Route::delete('/{id}/destroy', [UserController::class, 'destroy'])->name('destroy')->can('hapus pengguna');
     });
 
     // setting
     Route::prefix('setting')->group(function () {
-        Route::get('/', [SettingController::class, 'index'])->name('setting')->can('view-settings');
-        Route::post('/store', [SettingController::class, 'store'])->name('setting.store')->can('manage-settings');
-        Route::post('/dashboard-columns', [SettingController::class, 'saveDashboardColumns'])->name('setting.dashboard.columns')->can('manage-settings');
+        Route::get('/', [SettingController::class, 'index'])->name('setting')->can('lihat pengaturan');
+        Route::post('/store', [SettingController::class, 'store'])->name('setting.store')->can('ubah pengaturan');
+        Route::post('/dashboard-columns', [SettingController::class, 'saveDashboardColumns'])->name('setting.dashboard.columns')->can('ubah pengaturan');
+        Route::post('/test-fonnte', [SettingController::class, 'testFonnte'])->name('setting.test-fonnte')->can('ubah pengaturan');
     });
-
-    // Preview Tampilan Email Rekapan Harian di Browser
-    Route::get('/preview-daily-report', function () {
-        $shareholder = \App\Models\Shareholder::first();
-        $analytics = app(\App\Services\FinanceAnalyticsService::class);
-        $targetDate = request('date', date('Y-m-d'));
-        $dailyData = $analytics->getDailyDetailedReportData($targetDate, true);
-        $personalProfit = $dailyData['net_profit'] * (($shareholder->total_percentage ?? 0) / 100);
-
-        return new \App\Mail\DailyFinancialReportMail($shareholder, $dailyData, $personalProfit);
-    })->name('email.preview.daily');
-
-    // Unduh Dokumen PDF Laporan Finansial Harian Langsung
-    Route::get('/download-daily-report-pdf', function () {
-        $shareholder = \App\Models\Shareholder::first();
-        $setting = \App\Models\Setting::first();
-        $analytics = app(\App\Services\FinanceAnalyticsService::class);
-        $targetDate = request('date', date('Y-m-d'));
-        $dailyData = $analytics->getDailyDetailedReportData($targetDate, true);
-        $personalProfit = $dailyData['net_profit'] * (($shareholder->total_percentage ?? 0) / 100);
-
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.daily_financial_report', [
-            'shareholder'    => $shareholder,
-            'dailyData'      => $dailyData,
-            'personalProfit' => $personalProfit,
-            'setting'        => $setting,
-        ])->setPaper('a4', 'portrait');
-
-        $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $shareholder->name ?? 'Investor');
-        return $pdf->download("Laporan_Finansial_Harian_{$targetDate}_{$safeName}.pdf");
-    })->name('daily.report.pdf.download');
 });

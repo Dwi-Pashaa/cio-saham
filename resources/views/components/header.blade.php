@@ -19,7 +19,7 @@
                         </div>
                         <div class="d-flex align-items-center gap-1 mt-0.5" style="font-size: 0.7rem; color: #16a34a; font-weight: 600;">
                             <span class="pulse-live-dot" style="width: 6px; height: 6px;"></span>
-                            <span>{{ !Auth::user()->can('view-shareholders') ? 'Investor Saham Aktif' : 'CIO Saham Live' }}</span>
+                            <span>{{ !Auth::user()->can('lihat dashboard perusahaan') ? 'Investor Saham Aktif' : 'CIO Saham Live' }}</span>
                         </div>
                     </div>
                 @else
@@ -33,7 +33,7 @@
             <!-- Right: Quick Action Controls (Refresh & User Menu) -->
             <div class="d-flex align-items-center gap-2">
                 <!-- Quick Refresh Button -->
-                <button type="button" class="android-icon-btn" onclick="if(window.refreshFinanceChart) { window.refreshFinanceChart(); } else { window.location.reload(); }" title="Segarkan Data">
+                <button type="button" class="android-icon-btn" onclick="window.location.reload();" title="Segarkan Data">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
                 </button>
 
@@ -59,7 +59,7 @@
                                     <div class="small text-muted">Informasi akun & keamanan</div>
                                 </div>
                             </a>
-                            @if(Auth::user()->can('manage-settings') || Auth::user()->can('view-settings'))
+                            @if(Auth::user()->can('lihat pengaturan') || Auth::user()->can('ubah pengaturan'))
                                 <a href="{{ route('setting') }}" class="dropdown-item d-flex align-items-center gap-2.5 py-2">
                                     <span class="dropdown-item-icon bg-blue-lt">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" /><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></svg>
@@ -145,7 +145,7 @@
                                     <div class="small text-muted">Informasi akun & keamanan</div>
                                 </div>
                             </a>
-                            @if(Auth::user()->can('manage-settings') || Auth::user()->can('view-settings'))
+                            @if(Auth::user()->can('lihat pengaturan') || Auth::user()->can('ubah pengaturan'))
                                 <a href="{{ route('setting') }}" class="dropdown-item d-flex align-items-center gap-2.5 py-2">
                                     <span class="dropdown-item-icon bg-blue-lt">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" /><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /></svg>

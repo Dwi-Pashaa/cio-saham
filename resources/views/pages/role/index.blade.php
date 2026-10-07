@@ -1,97 +1,35 @@
 @extends('layouts.app')
 
 @section('pretitle', 'MASTER DATA')
-@section('title', 'Data Level / Role')
-@section('subtitle', 'Kelola tingkatan role dan hak akses fitur pengguna sistem.')
+@section('title', 'Level Akses')
+@section('subtitle', 'Kelola tingkatan level akses dan konfigurasi hak akses fitur pengguna sistem secara dinamis.')
 
 @section('actions')
-    <a href="javascript:void(0)" id="addBtn" data-bs-toggle="modal" data-bs-target="#modal-simple" class="btn btn-primary d-inline-flex align-items-center gap-1">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
-        + Tambah Level
-    </a>
+    @can('tambah level akses')
+        <a href="javascript:void(0)" id="addBtn" data-bs-toggle="modal" data-bs-target="#modal-simple" class="btn btn-primary d-inline-flex align-items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+            + Tambah Level
+        </a>
+    @endcan
 @endsection
 
 @section('content')
 <div class="card shadow-sm border bg-white">
-    <!-- Filter & Search Toolbar -->
-    <div class="filter-toolbar">
-        <div class="row g-3 align-items-center justify-content-between">
-            <div class="col-auto d-flex align-items-center gap-2">
-                <span class="text-muted small fw-medium">Tampilkan:</span>
-                <select name="sort" id="sort" class="form-select form-select-sm" style="width: 75px;">
-                    @foreach ([10, 25, 50, 100] as $opt)
-                        <option value="{{ $opt }}" {{ request('sort') == $opt ? 'selected' : '' }}>{{ $opt }}</option>
-                    @endforeach
-                </select>
-                <span class="text-muted small fw-medium">data</span>
-            </div>
-            <div class="col-md-4 col-12">
-                <form method="GET">
-                    <div class="input-group input-group-sm">
-                        <input type="text" class="form-control" name="search" value="{{ request('search') }}" placeholder="Cari nama level/role...">
-                        <button class="btn btn-primary px-3" type="submit">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="table-responsive">
-        <table class="table card-table table-vcenter table-hover">
+    <div class="table-responsive p-3">
+        <table id="table-roles" class="table card-table table-vcenter table-hover w-100">
             <thead>
                 <tr>
-                    <th class="text-center" style="width: 60px;">No</th>
-                    <th>Nama Level / Role</th>
+                    <th class="text-center" style="width: 50px;">No</th>
+                    <th>Nama Level</th>
+                    <th>Jumlah Pengguna</th>
+                    <th>Hak Akses</th>
                     <th>Tanggal Dibuat</th>
                     <th class="text-center" style="width: 140px;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($roles as $item)
-                    <tr>
-                        <td class="text-center text-muted fw-semibold">
-                            {{ $loop->iteration + ($roles->currentPage() - 1) * $roles->perPage() }}
-                        </td>
-                        <td>
-                            <span class="badge badge-soft-primary px-3 py-1 fw-bold fs-6">
-                                {{ $item->name }}
-                            </span>
-                        </td>
-                        <td class="text-muted small">
-                            {{ \Carbon\Carbon::parse($item->created_at)->format('d M Y, H:i') }} WIB
-                        </td>
-                        <td class="text-center">
-                            <div class="action-btn-group">
-                                <a href="{{ route('role.permission', ['id' => $item->id]) }}" class="btn-action btn-action-primary" title="Atur Hak Akses / Permission">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M11.5 21h-4.5a2 2 0 0 1 -2 -2v-6a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /><path d="M20 21l2 -2l-2 -2" /><path d="M17 17l-2 2l2 2" /></svg>
-                                </a>
-                                <a href="javascript:void(0)" onclick="return editModal('{{ $item->id }}')" class="btn-action btn-action-warning" title="Edit Level">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" /><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" /><path d="M16 5l3 3" /></svg>
-                                </a>
-                                <button type="button" onclick="return deleteType('{{ $item->id }}')" class="btn-action btn-action-danger" title="Hapus Level">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
-                                </button>
-                            </div>
-                        </td> 
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="text-center py-5 text-muted">Tidak Ada Data Level</td>
-                    </tr>
-                @endforelse
             </tbody>
         </table>
-    </div>
-
-    <div class="table-footer d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-        <p class="m-0 text-muted small">
-            Menampilkan <span class="fw-semibold text-dark">{{ $roles->firstItem() ?? 0 }}</span> - <span class="fw-semibold text-dark">{{ $roles->lastItem() ?? 0 }}</span> dari <span class="fw-semibold text-dark">{{ $roles->total() }}</span> total entri
-        </p>
-        <div class="m-0">
-            {{ $roles->links() }}
-        </div>
     </div>
 </div>
 @endsection
@@ -109,7 +47,7 @@
                 <input type="hidden" name="id" id="id">
                 <div class="mb-3">
                     <label for="name" class="form-label required">Nama Level</label>
-                    <input type="text" name="name" id="name" class="form-control" placeholder="Contoh: Manager / Staff" required>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Contoh: Staf Keuangan / Auditor" required>
                     <span class="invalid-feedback error_name"></span>
                 </div>
             </div>
@@ -126,12 +64,6 @@
 <script>
     const BASE = "{{ route('role.index') }}";
 
-    let params = new URLSearchParams(window.location.search);
-    $("#sort").change(function() {
-        params.set('sort', $(this).val());
-        window.location.href = BASE + '?' + params.toString();
-    });
-
     const Toast = Swal.mixin({
         toast: true,
         position: "top-end",
@@ -140,16 +72,39 @@
         timerProgressBar: true
     });
 
+    let table;
+    $(document).ready(function() {
+        table = $('#table-roles').DataTable({
+            processing: true,
+            serverSide: true,
+            responsive: true,
+            ajax: "{{ route('role.index') }}",
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: 'text-center text-muted fw-semibold' },
+                { data: 'name_badge', name: 'name' },
+                { data: 'users_count', name: 'users_count', orderable: false, searchable: false },
+                { data: 'permissions_count', name: 'permissions_count', orderable: false, searchable: false },
+                { data: 'created_at_formatted', name: 'created_at' },
+                { data: 'action', name: 'action', orderable: false, searchable: false, className: 'text-center' },
+            ],
+            order: [[1, 'asc']],
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
+        });
+    });
+
     $("#addBtn").click(function() {
         $(".modal-title").html("Tambah Level");
         $("#name").val("");
         $("#type").val("create");
         $("#id").val("");
+        $("#name").removeClass('is-invalid');
+        $(".error_name").html('');
     });
 
     $("#storeBtn").click(function() {
         let id = $("#id").val();
-        let type = $("#type").val()
+        let type = $("#type").val();
         let name = $("#name").val();
 
         let url;
@@ -159,7 +114,7 @@
             url = BASE + '/store';
             method = "POST";
         } else {
-            url = BASE + `/${id}/update`
+            url = BASE + `/${id}/update`;
             method = "PUT";
         }
         
@@ -179,17 +134,22 @@
                         $("#name").removeClass('is-invalid');
                         $(".error_" + index).html('');
                     }, 3000);
-                })                
+                });
+            } else if (response.status === 'error') {
+                Toast.fire({
+                    icon: 'error',
+                    title: response.message
+                });
             } else {
-                $("#modal-simple").modal('hide')
+                $("#modal-simple").modal('hide');
                 Toast.fire({
                     icon: response.status,
                     title: response.message
                 });
 
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
+                if (table) {
+                    table.ajax.reload(null, false);
+                }
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.log("Error:", textStatus, errorThrown);
@@ -197,7 +157,7 @@
     });
 
     function editModal(id) {
-        let url = BASE + `/${id}/show`
+        let url = BASE + `/${id}/show`;
         $.ajax({
             url: url,
             method: "GET",
@@ -205,11 +165,13 @@
         }).done(function(response){
             $(".modal-title").html("Edit Level");
             let data = response.data;
-            $("#modal-simple").modal('show')
+            $("#modal-simple").modal('show');
 
             $("#id").val(data.id);
             $("#name").val(data.name);
             $("#type").val("update");
+            $("#name").removeClass('is-invalid');
+            $(".error_name").html('');
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.log("Error:", textStatus, errorThrown);
         });
@@ -237,9 +199,9 @@
                             title: response.message
                         });
 
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
+                        if (table) {
+                            table.ajax.reload(null, false);
+                        }
                     },
                     error: function(err) {
                         Toast.fire({
@@ -247,7 +209,7 @@
                             title: "Gagal menghapus data dari server."
                         });
                     }
-                })
+                });
             }
         });
     }

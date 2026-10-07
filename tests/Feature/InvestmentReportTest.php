@@ -7,17 +7,19 @@ use App\Models\InvestmentReport;
 use App\Models\Shareholder;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class InvestmentReportTest extends TestCase
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->artisan('migrate');
         $this->withoutMiddleware(VerifyCsrfToken::class);
 
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
@@ -77,11 +79,15 @@ class InvestmentReportTest extends TestCase
         $report = InvestmentReport::where('shareholder_id', $shareholder->id)->where('year', 2025)->first();
         $this->assertNotNull($report);
 
-        // 2. Admin view index list
+        // 2. Admin view index list & DataTables AJAX
         $indexResponse = $this->actingAs($admin)->get(route('investment-reports.index'));
         $indexResponse->assertStatus(200);
-        $indexResponse->assertSee('Investor Laporan Test');
-        $indexResponse->assertSee('2025');
+        $indexResponse->assertSee('table-investment-reports');
+
+        $ajaxResponse = $this->actingAs($admin)->getJson(route('investment-reports.index'), ['X-Requested-With' => 'XMLHttpRequest']);
+        $ajaxResponse->assertStatus(200);
+        $ajaxResponse->assertSee('Investor Laporan Test');
+        $ajaxResponse->assertSee('2025');
 
         // 3. Admin update report manually (ubah profit jadi 75)
         $updateResponse = $this->actingAs($admin)->put(route('investment-reports.update', $report->id), [
@@ -165,13 +171,15 @@ class InvestmentReportTest extends TestCase
         // Yoga mengakses index laporan
         $response = $this->actingAs($user)->get(route('investment-reports.index'));
         $response->assertStatus(200);
-        $response->assertSee('Yoga Pratama');
-        $response->assertSee('Laporan Yoga');
-        $response->assertDontSee('Other Secret Investor');
-        $response->assertDontSee('Laporan Rahasia Other');
-
-        // Pastikan Yoga TIDAK melihat tombol Tambah Laporan
+        $response->assertSee('table-investment-reports');
         $response->assertDontSee('Tambah Laporan Tahunan');
+
+        $ajaxResponse = $this->actingAs($user)->getJson(route('investment-reports.index'), ['X-Requested-With' => 'XMLHttpRequest']);
+        $ajaxResponse->assertStatus(200);
+        $ajaxResponse->assertSee('Yoga Pratama');
+        $ajaxResponse->assertSee('Laporan Yoga');
+        $ajaxResponse->assertDontSee('Other Secret Investor');
+        $ajaxResponse->assertDontSee('Laporan Rahasia Other');
 
         // Yoga mencoba membuat laporan -> 403 Forbidden
         $forbiddenStore = $this->actingAs($user)->post(route('investment-reports.store'), [

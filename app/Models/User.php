@@ -46,28 +46,11 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function investor()
+    /**
+     * Relasi ke data Profil Pemegang Saham (Shareholder).
+     */
+    public function shareholder()
     {
-        return $this->hasOne(Investor::class, 'users_id', 'id');
-    }
-
-    public function investors()
-    {
-        return $this->hasMany(Investor::class, 'users_id', 'id');
-    }
-
-    public function getTotalFundsAttribute()
-    {
-        return $this->investors->sum('bussines_funds');
-    }
-
-    public function getTotalMonthlyIncomeAttribute()
-    {
-        return $this->investors->sum('monthly_income');
-    }
-
-    public function transfer() 
-    {
-        return $this->hasMany(Transfer::class, 'investors_id', 'id');    
+        return $this->hasOne(Shareholder::class, 'user_id', 'id');
     }
 }
