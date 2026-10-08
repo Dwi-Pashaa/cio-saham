@@ -5,6 +5,10 @@
 @section('subtitle', 'Pencatatan mutasi dana keluar dan biaya operasional PT CIO NETWORK.')
 
 @section('actions')
+    <a href="{{ route('cash-outcomes.export') }}" id="btn-export-outcome-excel" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center gap-1.5 shadow-sm px-3 py-2 rounded-2" title="Unduh data pengeluaran kas ke Excel">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M10 12l4 4m0 -4l-4 4" /></svg>
+        <span class="fw-semibold">Download Excel</span>
+    </a>
     @can('tambah pengeluaran')
         <button type="button" class="btn btn-danger btn-sm d-inline-flex align-items-center gap-1.5 shadow-sm px-3 py-2 rounded-2" data-bs-toggle="modal" data-bs-target="#modalAddOutcome">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
@@ -893,6 +897,17 @@
                     });
                 }
             });
+        });
+        // Download Excel with active date filters
+        $('#btn-export-outcome-excel').on('click', function () {
+            const startDate = $('#filter_start_date').val();
+            const endDate = $('#filter_end_date').val();
+            const baseUrl = "{{ route('cash-outcomes.export') }}";
+            const params = new URLSearchParams();
+            if (startDate) params.set('start_date', startDate);
+            if (endDate) params.set('end_date', endDate);
+            const query = params.toString();
+            $(this).attr('href', query ? `${baseUrl}?${query}` : baseUrl);
         });
     });
 </script>

@@ -5,6 +5,10 @@
 @section('subtitle', 'Pencatatan dan monitoring inventaris perangkat serta aset operasional PT dan investor.')
 
 @section('actions')
+    <a href="{{ route('assets.export') }}" id="btn-export-asset-excel" class="btn btn-outline-primary btn-sm d-inline-flex align-items-center gap-1.5 shadow-sm px-3 py-2 rounded-2" title="Unduh inventaris aset ke Excel">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M10 12l4 4m0 -4l-4 4" /></svg>
+        <span class="fw-semibold">Download Excel</span>
+    </a>
     @can('tambah aset')
         <button type="button" class="btn btn-primary btn-sm d-inline-flex align-items-center gap-1.5 shadow-sm px-3 py-2 rounded-2" data-bs-toggle="modal" data-bs-target="#modalAddAsset">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
@@ -1111,6 +1115,17 @@ $(document).ready(function () {
                     }
                 });
             }
+        });
+        // Download Excel with active filters
+        $('#btn-export-asset-excel').on('click', function () {
+            const type = $('#filter_type').val();
+            const ownerType = $('#filter_owner_type').val();
+            const baseUrl = "{{ route('assets.export') }}";
+            const params = new URLSearchParams();
+            if (type) params.set('type', type);
+            if (ownerType) params.set('owner_type', ownerType);
+            const query = params.toString();
+            $(this).attr('href', query ? `${baseUrl}?${query}` : baseUrl);
         });
     });
 });

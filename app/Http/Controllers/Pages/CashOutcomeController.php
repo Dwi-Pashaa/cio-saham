@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Pages;
 
+use App\Exports\CashOutcomeExport;
 use App\Http\Controllers\Controller;
 use App\Models\CashOutcome;
 use App\Services\CashNotificationService;
@@ -9,10 +10,26 @@ use App\Services\XenditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class CashOutcomeController extends Controller
 {
+    /**
+     * Unduh daftar pengeluaran kas ke format file Excel (.xlsx).
+     */
+    public function export(Request $request)
+    {
+        $fileName = 'pengeluaran_kas_pt_cio_' . date('Ymd_His') . '.xlsx';
+        return Excel::download(
+            new CashOutcomeExport(
+                $request->start_date,
+                $request->end_date
+            ),
+            $fileName
+        );
+    }
+
     public function index(Request $request)
     {
         $query = CashOutcome::with('creator')->orderBy('transaction_date', 'desc')->orderBy('id', 'desc');

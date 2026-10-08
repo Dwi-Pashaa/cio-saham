@@ -69,6 +69,11 @@ class RolePermissionSeeder extends Seeder
             'ubah pengeluaran',
             'hapus pengeluaran',
 
+            // 4. Transaksi Kas - Tabungan
+            'lihat tabungan',
+            'bagikan ke tabungan',
+            'hapus tabungan',
+
             // 5. Manajemen Aset
             'lihat aset',
             'tambah aset',

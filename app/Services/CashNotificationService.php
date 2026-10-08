@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Asset;
 use App\Models\CashIncome;
 use App\Models\CashOutcome;
+use App\Models\CashSaving;
 use App\Models\Setting;
 use App\Models\Shareholder;
 use Illuminate\Support\Facades\Log;
@@ -71,13 +73,14 @@ class CashNotificationService
 
     /**
      * Hitung total saldo kas PT saat ini.
-     * Saldo = Total Pemasukan Bersih - Total Pengeluaran Kas
+     * Saldo = Total Pemasukan Bersih - Total Pengeluaran Kas - Total Alokasi Tabungan
      */
     public function getCurrentCashBalance(): float
     {
         $totalIncome = (float) CashIncome::sum('net_amount');
         $totalOutcome = (float) CashOutcome::sum('total_amount');
-        return $totalIncome - $totalOutcome;
+        $totalSavings = (float) CashSaving::sum('amount');
+        return $totalIncome - $totalOutcome - $totalSavings;
     }
 
     /**
@@ -189,6 +192,110 @@ class CashNotificationService
             $message,
             $proofUrl,
             'bukti_keluar_' . $outcome->transaction_number . '.jpg',
+            $localFilePath
+        );
+    }
+
+    /**
+     * Kirim notifikasi WhatsApp otomatis saat Saldo dialokasikan/dibagikan ke Tabungan.
+     */
+    public function notifySavingCreated(CashSaving $saving): array
+    {
+        if (!$this->isNotificationEnabled()) {
+            return ['status' => false, 'message' => 'Notifikasi dinonaktifkan di pengaturan.'];
+        }
+
+        $target = $this->getRecipientPhoneNumbers();
+        if (empty($target)) {
+            Log::warning('[CashNotificationService] Nomor WhatsApp target / investor belum tersedia.');
+            return ['status' => false, 'message' => 'Nomor WhatsApp target / investor belum tersedia.'];
+        }
+
+        // Saldo Terkini dan Sebelumnya
+        $currentBalance = $this->getCurrentCashBalance();
+        $savingAmount = (float) $saving->amount;
+        $previousBalance = $currentBalance + $savingAmount;
+
+        $trxDateFormatted = $saving->transaction_date
+            ? $saving->transaction_date->format('d/m/Y')
+            : now()->format('d/m/Y');
+
+        $proofUrl = $saving->proof_url ?: ($saving->proof_file ? asset('storage/' . $saving->proof_file) : '-');
+        $localFilePath = $saving->proof_file ? storage_path('app/public/' . $saving->proof_file) : null;
+
+        $message = "NOTIFIKASI ALOKASI KE TABUNGAN " . $trxDateFormatted . "\n"
+                 . "No Transaksi            : " . $saving->transaction_number . "\n"
+                 . "Penerima / Rekening     : " . ($saving->recipient_name ?: '-') . "\n"
+                 . "Bank Tujuan             : " . ($saving->bank_name ?: '-') . "\n"
+                 . "No Rekening             : " . ($saving->account_number ?: '-') . "\n"
+                 . "Nominal Tabungan        : Rp " . number_format($savingAmount, 0, ',', '.') . "\n"
+                 . "Bukti Transfer          : " . $proofUrl . "\n"
+                 . "Catatan                 : " . ($saving->notes ?: '-') . "\n"
+                 . "-------------------------------------\n"
+                 . "SISA KAS OPERASIONAL    : Rp " . number_format($currentBalance, 0, ',', '.') . "\n"
+                 . "TOTAL SALDO TABUNGAN    : Rp " . number_format((float) CashSaving::sum('amount'), 0, ',', '.') . "\n"
+                 . "--------------------------------------";
+
+        return $this->fonnteService->sendMessage(
+            $target,
+            $message,
+            $proofUrl !== '-' ? $proofUrl : null,
+            'bukti_tabungan_' . $saving->transaction_number . '.jpg',
+            $localFilePath
+        );
+    }
+
+    /**
+     * Kirim notifikasi WhatsApp otomatis saat Aset Perusahaan / Investor baru ditambahkan.
+     */
+    public function notifyAssetCreated(Asset $asset): array
+    {
+        if (!$this->isNotificationEnabled()) {
+            return ['status' => false, 'message' => 'Notifikasi dinonaktifkan di pengaturan.'];
+        }
+
+        $target = $this->getRecipientPhoneNumbers();
+        if (empty($target)) {
+            Log::warning('[CashNotificationService] Nomor WhatsApp target / investor belum tersedia.');
+            return ['status' => false, 'message' => 'Nomor WhatsApp target / investor belum tersedia.'];
+        }
+
+        $trxDateFormatted = $asset->purchase_date
+            ? $asset->purchase_date->format('d/m/Y')
+            : now()->format('d/m/Y');
+
+        $primaryImage = $asset->images()->where('is_primary', true)->first() ?: $asset->images()->first();
+        $imageUrl = $primaryImage ? asset('storage/' . $primaryImage->image_path) : '-';
+        $localFilePath = $primaryImage ? storage_path('app/public/' . $primaryImage->image_path) : null;
+
+        $totalAssetValue = (float) Asset::sum('price');
+        $totalAssetCount = (int) Asset::count();
+
+        $ownership = $asset->owner_type === 'pt' ? 'PT CIO NETWORK SOLUTION' : 'Pemegang Saham / Investor';
+        $ownerDetail = $asset->owner_type === 'shareholder'
+            ? ($asset->shareholder?->name ?: ($asset->owner_name ?: 'Investor'))
+            : 'PT CIO NETWORK SOLUTION';
+
+        $message = "NOTIFIKASI PENAMBAHAN ASET PERUSAHAAN\n"
+                 . "Tanggal Perolehan       : " . $trxDateFormatted . "\n"
+                 . "Nama Aset               : " . $asset->name . "\n"
+                 . "Kategori                : " . $asset->type . "\n"
+                 . "Nilai / Harga Aset      : Rp " . number_format((float) $asset->price, 0, ',', '.') . "\n"
+                 . "Kepemilikan             : " . $ownership . " (" . $ownerDetail . ")\n"
+                 . "Serial Number (SN)      : " . ($asset->serial_number ?: '-') . "\n"
+                 . "MAC Address             : " . ($asset->mac_address ?: '-') . "\n"
+                 . "Foto Aset               : " . $imageUrl . "\n"
+                 . "Catatan                 : " . ($asset->notes ?: '-') . "\n"
+                 . "-------------------------------------\n"
+                 . "TOTAL NILAI ASET PT     : Rp " . number_format($totalAssetValue, 0, ',', '.') . "\n"
+                 . "TOTAL UNIT ASET         : " . number_format($totalAssetCount, 0, ',', '.') . " Unit\n"
+                 . "--------------------------------------";
+
+        return $this->fonnteService->sendMessage(
+            $target,
+            $message,
+            $imageUrl !== '-' ? $imageUrl : null,
+            'aset_' . $asset->id . '.jpg',
             $localFilePath
         );
     }

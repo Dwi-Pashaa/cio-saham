@@ -4,13 +4,14 @@
         'categories' => [],
         'series' => [],
         'summary' => [
-            'total_income' => 0,
+            'total_balance' => 0,
+            'total_income'  => 0,
             'total_outcome' => 0,
-            'total_asset' => 0,
+            'total_asset'   => 0,
         ],
     ],
     'title' => 'Grafik Tren Keuangan & Aset Perusahaan',
-    'subtitle' => 'Perbandingan pemasukan, pengeluaran, dan perolehan aset berdasarkan periode.'
+    'subtitle' => 'Perbandingan saldo kas saat ini, pemasukan, pengeluaran, dan perolehan aset berdasarkan periode.'
 ])
 
 @php
@@ -22,9 +23,10 @@
         'year'       => 'Tahun Ini',
     ];
     $kpis = [
-        ['key' => 'income',  'idx' => 0, 'label' => 'Pemasukan',   'color' => '#10b981', 'soft' => 'rgba(16,185,129,.08)', 'value' => $chartData['summary']['total_income'] ?? 0],
-        ['key' => 'outcome', 'idx' => 1, 'label' => 'Pengeluaran', 'color' => '#ef4444', 'soft' => 'rgba(239,68,68,.08)',  'value' => $chartData['summary']['total_outcome'] ?? 0],
-        ['key' => 'asset',   'idx' => 2, 'label' => 'Asset',       'color' => '#206bc4', 'soft' => 'rgba(32,107,196,.08)', 'value' => $chartData['summary']['total_asset'] ?? 0],
+        ['key' => 'balance', 'idx' => 0, 'label' => 'Total Saldo',  'color' => '#0ea5e9', 'soft' => 'rgba(14,165,233,.08)', 'value' => $chartData['summary']['total_balance'] ?? 0],
+        ['key' => 'income',  'idx' => 1, 'label' => 'Pemasukan',    'color' => '#10b981', 'soft' => 'rgba(16,185,129,.08)', 'value' => $chartData['summary']['total_income'] ?? 0],
+        ['key' => 'outcome', 'idx' => 2, 'label' => 'Pengeluaran',  'color' => '#ef4444', 'soft' => 'rgba(239,68,68,.08)',  'value' => $chartData['summary']['total_outcome'] ?? 0],
+        ['key' => 'asset',   'idx' => 3, 'label' => 'Asset',        'color' => '#206bc4', 'soft' => 'rgba(32,107,196,.08)', 'value' => $chartData['summary']['total_asset'] ?? 0],
     ];
 @endphp
 
@@ -39,7 +41,7 @@
     .ftc-segment button:hover { color: #0f172a; }
     .ftc-segment button.active { background: #fff; color: #0f172a; box-shadow: 0 1px 2px rgba(15,23,42,.08), 0 1px 1px rgba(15,23,42,.04); }
 
-    .ftc-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 0 22px 6px; }
+    .ftc-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 0 22px 6px; }
     .ftc-kpi { position: relative; display: flex; flex-direction: column; gap: 4px; text-align: left; border: 1px solid #eef1f5; border-radius: 12px; padding: 12px 14px 12px 16px; background: #fff; cursor: pointer; transition: all .18s ease; overflow: hidden; }
     .ftc-kpi::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; border-radius: 0 3px 3px 0; background: var(--kpi-color); }
     .ftc-kpi:hover { background: var(--kpi-soft); border-color: transparent; }
@@ -61,7 +63,10 @@
     #finance-trend-apexchart .apexcharts-tooltip { border: 1px solid #e2e8f0 !important; box-shadow: 0 8px 24px rgba(15,23,42,.08) !important; border-radius: 10px !important; }
     #finance-trend-apexchart .apexcharts-tooltip-title { background: #f8fafc !important; border-bottom: 1px solid #eef1f5 !important; font-weight: 600 !important; font-size: 12px !important; }
 
-    @media (max-width: 767.98px) {
+    @media (max-width: 991.98px) {
+        .ftc-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 575.98px) {
         .ftc-kpis { grid-template-columns: 1fr; }
         .ftc-header { padding: 16px; }
         .ftc-kpis { padding: 0 16px 6px; }
@@ -128,20 +133,24 @@
     const formatRupiah = (n) => 'Rp ' + idr.format(Math.round(n || 0));
     const formatCompact = (v) => {
         const a = Math.abs(v);
-        if (a >= 1e9) return 'Rp ' + (v / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' M';
-        if (a >= 1e6) return 'Rp ' + (v / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt';
-        if (a >= 1e3) return 'Rp ' + (v / 1e3).toLocaleString('id-ID', { maximumFractionDigits: 0 }) + ' rb';
-        return 'Rp ' + idr.format(v);
+        const prefix = v < 0 ? '-' : '';
+        if (a >= 1e9) return prefix + 'Rp ' + (a / 1e9).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' M';
+        if (a >= 1e6) return prefix + 'Rp ' + (a / 1e6).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt';
+        if (a >= 1e3) return prefix + 'Rp ' + (a / 1e3).toLocaleString('id-ID', { maximumFractionDigits: 0 }) + ' rb';
+        return prefix + 'Rp ' + idr.format(a);
     };
 
-    const isEmpty = (series) => !series.some(s => (s.data || []).some(v => Number(v) > 0));
+    const isEmpty = (series) => !series.some(s => (s.data || []).some(v => Math.abs(Number(v)) > 0));
     const toggleEmpty = (series) => {
         const el = document.getElementById('chart-empty-state');
         if (el) el.classList.toggle('show', isEmpty(series));
     };
 
     const baseSeries = initialSeries.length ? initialSeries : [
-        { name: 'Pemasukan', data: [] }, { name: 'Pengeluaran', data: [] }, { name: 'Asset', data: [] }
+        { name: 'Total Saldo', data: [] },
+        { name: 'Pemasukan', data: [] },
+        { name: 'Pengeluaran', data: [] },
+        { name: 'Asset', data: [] }
     ];
 
     const options = {
@@ -155,7 +164,7 @@
             parentHeightOffset: 0,
         },
         series: baseSeries.map(s => ({ name: s.name, data: s.data })),
-        colors: ['#10b981', '#ef4444', '#206bc4'],
+        colors: ['#0ea5e9', '#10b981', '#ef4444', '#206bc4'],
         stroke: { curve: 'monotoneCubic', width: 2.25, lineCap: 'round' },
         fill: {
             type: 'gradient',
@@ -187,7 +196,6 @@
             tooltip: { enabled: false }
         },
         yaxis: {
-            min: 0,
             forceNiceScale: true,
             tickAmount: 4,
             labels: {
@@ -254,6 +262,9 @@
                         toggleEmpty(data.series);
                     }
                     if (data.summary) {
+                        if (document.getElementById('chart-sum-balance')) {
+                            document.getElementById('chart-sum-balance').textContent = formatRupiah(data.summary.total_balance);
+                        }
                         document.getElementById('chart-sum-income').textContent  = formatRupiah(data.summary.total_income);
                         document.getElementById('chart-sum-outcome').textContent = formatRupiah(data.summary.total_outcome);
                         document.getElementById('chart-sum-asset').textContent   = formatRupiah(data.summary.total_asset);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Pages;
 
+use App\Exports\CashIncomeExport;
 use App\Http\Controllers\Controller;
 use App\Models\CashIncome;
 use App\Services\CashNotificationService;
@@ -9,10 +10,26 @@ use App\Services\XenditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class CashIncomeController extends Controller
 {
+    /**
+     * Unduh daftar pemasukan kas ke format file Excel (.xlsx).
+     */
+    public function export(Request $request)
+    {
+        $fileName = 'pemasukan_kas_pt_cio_' . date('Ymd_His') . '.xlsx';
+        return Excel::download(
+            new CashIncomeExport(
+                $request->start_date,
+                $request->end_date
+            ),
+            $fileName
+        );
+    }
+
     public function index(Request $request)
     {
         $query = CashIncome::with('creator')->orderBy('transaction_date', 'desc')->orderBy('id', 'desc');

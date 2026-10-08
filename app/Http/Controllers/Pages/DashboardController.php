@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\CashIncome;
 use App\Models\CashOutcome;
+use App\Models\CashSaving;
 use App\Models\Shareholder;
 use App\Services\ShareholderService;
+use App\Services\XenditService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
@@ -26,14 +28,26 @@ class DashboardController extends Controller
         $user = auth()->user();
         $equitySummary = $this->shareholderService->getEquitySummary();
 
-        // Metrik Saldo Kas Terkini (Total Income - Total Outcome)
-        $totalCashIncome    = (float) CashIncome::sum('net_amount');
-        $totalCashOutcome   = (float) CashOutcome::sum('total_amount');
-        $currentCashBalance = $totalCashIncome - $totalCashOutcome;
+        // Metrik Saldo Kas Terkini (Total Income - Total Outcome - Total Savings)
+        $totalCashIncome     = (float) CashIncome::sum('net_amount');
+        $totalCashOutcome    = (float) CashOutcome::sum('total_amount');
+        $totalSavingsBalance = (float) CashSaving::sum('amount');
+        $totalSavingsCount   = (int) CashSaving::count();
+        $currentCashBalance  = $totalCashIncome - $totalCashOutcome - $totalSavingsBalance;
 
         // Metrik Total Asset (Murni akumulasi harga seluruh aset tanpa pengurangan apapun)
         $totalAssetValue    = (float) Asset::sum('price');
         $totalAssetCount    = (int) Asset::count();
+
+        // Data Log History Tabungan (Terbaru, paginate 10)
+        $savingsLogs = CashSaving::with('creator')
+            ->latest('transaction_date')
+            ->latest('id')
+            ->paginate(10, ['*'], 'savings_page')
+            ->withQueryString();
+
+        $newSavingTransactionNumber = CashSaving::generateTransactionNumber();
+        $banksGrouped = XenditService::getSupportedBanks();
 
         // Data Grafik Finansial & Asset (30 hari terakhir sebagai default)
         $chartData = $this->getFinanceChartData('30d');
@@ -84,6 +98,8 @@ class DashboardController extends Controller
                 'portfoliosCount',
                 'totalCashIncome',
                 'totalCashOutcome',
+                'totalSavingsBalance',
+                'totalSavingsCount',
                 'currentCashBalance',
                 'totalAssetValue',
                 'totalAssetCount',
@@ -95,6 +111,8 @@ class DashboardController extends Controller
             'equitySummary',
             'totalCashIncome',
             'totalCashOutcome',
+            'totalSavingsBalance',
+            'totalSavingsCount',
             'currentCashBalance',
             'totalAssetValue',
             'totalAssetCount',
@@ -102,7 +120,10 @@ class DashboardController extends Controller
             'financeSummary',
             'topShareholders',
             'startDate',
-            'endDate'
+            'endDate',
+            'savingsLogs',
+            'newSavingTransactionNumber',
+            'banksGrouped'
         ));
     }
 
@@ -114,21 +135,25 @@ class DashboardController extends Controller
         $income  = CashIncome::query();
         $outcome = CashOutcome::query();
         $asset   = Asset::query();
+        $saving  = CashSaving::query();
 
         if ($startDate) {
             $income->whereDate('transaction_date', '>=', $startDate);
             $outcome->whereDate('transaction_date', '>=', $startDate);
             $asset->whereRaw('DATE(COALESCE(purchase_date, created_at)) >= ?', [$startDate]);
+            $saving->whereDate('transaction_date', '>=', $startDate);
         }
         if ($endDate) {
             $income->whereDate('transaction_date', '<=', $endDate);
             $outcome->whereDate('transaction_date', '<=', $endDate);
             $asset->whereRaw('DATE(COALESCE(purchase_date, created_at)) <= ?', [$endDate]);
+            $saving->whereDate('transaction_date', '<=', $endDate);
         }
 
         $incomeTotal  = (float) (clone $income)->sum('net_amount');
         $outcomeTotal = (float) (clone $outcome)->sum('total_amount');
         $assetTotal   = (float) (clone $asset)->sum('price');
+        $savingTotal  = (float) (clone $saving)->sum('amount');
 
         return [
             'rows' => [
@@ -155,6 +180,18 @@ class DashboardController extends Controller
                     'color'      => 'danger',
                 ],
                 [
+                    'key'        => 'saving',
+                    'label'      => 'Tabungan',
+                    'desc'       => 'Total kas dialokasikan ke tabungan',
+                    'total'      => $savingTotal,
+                    'count'      => (int) $saving->count(),
+                    'unit'       => 'Transaksi',
+                    'route'      => 'dashboard',
+                    'fragment'   => 'savings-history-section',
+                    'permission' => 'lihat tabungan',
+                    'color'      => 'azure',
+                ],
+                [
                     'key'        => 'asset',
                     'label'      => 'Asset',
                     'desc'       => 'Total nilai perolehan aset',
@@ -166,8 +203,10 @@ class DashboardController extends Controller
                     'color'      => 'primary',
                 ],
             ],
-            'cash_balance' => $incomeTotal - $outcomeTotal,
-            'grand_total'  => $incomeTotal + $outcomeTotal + $assetTotal,
+            'cash_balance'   => $incomeTotal - $outcomeTotal - $savingTotal,
+            'saving_balance' => $savingTotal,
+            'asset_balance'  => $assetTotal,
+            'grand_total'    => $incomeTotal + $outcomeTotal + $assetTotal + $savingTotal,
         ];
     }
 
@@ -181,14 +220,16 @@ class DashboardController extends Controller
     }
 
     /**
-     * Menghasilkan data deret waktu untuk 3 garis:
-     * - Hijau: Pemasukan (CashIncome)
-     * - Merah: Pengeluaran (CashOutcome)
-     * - Biru : Asset (Asset)
+     * Menghasilkan data deret waktu untuk 4 garis:
+     * - Sky Blue: Total Saldo Kas (Kumulatif: Saldo Kas Saat Ini)
+     * - Hijau   : Pemasukan (CashIncome)
+     * - Merah   : Pengeluaran (CashOutcome)
+     * - Biru    : Asset (Asset)
      */
     public function getFinanceChartData(string $range = '30d'): array
     {
         $categories  = [];
+        $balanceData = [];
         $incomeData  = [];
         $outcomeData = [];
         $assetData   = [];
@@ -211,6 +252,12 @@ class DashboardController extends Controller
             $startStr = $startDate->toDateString();
             $endStr   = $endDate->toDateString();
 
+            // Saldo kas sebelum tanggal mulai periode untuk akumulasi running balance
+            $priorIncome  = (float) CashIncome::whereDate('transaction_date', '<', $startStr)->sum('net_amount');
+            $priorOutcome = (float) CashOutcome::whereDate('transaction_date', '<', $startStr)->sum('total_amount');
+            $priorSaving  = (float) CashSaving::whereDate('transaction_date', '<', $startStr)->sum('amount');
+            $runningBalance = $priorIncome - $priorOutcome - $priorSaving;
+
             $incomes = CashIncome::whereBetween('transaction_date', [$startStr, $endStr])
                 ->selectRaw('DATE(transaction_date) as t_date, SUM(net_amount) as total')
                 ->groupBy('t_date')
@@ -219,6 +266,12 @@ class DashboardController extends Controller
 
             $outcomes = CashOutcome::whereBetween('transaction_date', [$startStr, $endStr])
                 ->selectRaw('DATE(transaction_date) as t_date, SUM(total_amount) as total')
+                ->groupBy('t_date')
+                ->pluck('total', 't_date')
+                ->all();
+
+            $savings = CashSaving::whereBetween('transaction_date', [$startStr, $endStr])
+                ->selectRaw('DATE(transaction_date) as t_date, SUM(amount) as total')
                 ->groupBy('t_date')
                 ->pluck('total', 't_date')
                 ->all();
@@ -232,13 +285,27 @@ class DashboardController extends Controller
             foreach ($period as $dt) {
                 $dateKey = $dt->format('Y-m-d');
                 $categories[]  = $dt->translatedFormat('d M');
-                $incomeData[]  = (float) ($incomes[$dateKey] ?? 0);
-                $outcomeData[] = (float) ($outcomes[$dateKey] ?? 0);
-                $assetData[]   = (float) ($assets[$dateKey] ?? 0);
+                $inc = (float) ($incomes[$dateKey] ?? 0);
+                $out = (float) ($outcomes[$dateKey] ?? 0);
+                $sav = (float) ($savings[$dateKey] ?? 0);
+                $ast = (float) ($assets[$dateKey] ?? 0);
+
+                $runningBalance += ($inc - $out - $sav);
+
+                $balanceData[] = $runningBalance;
+                $incomeData[]  = $inc;
+                $outcomeData[] = $out;
+                $assetData[]   = $ast;
             }
         } elseif ($range === 'year') {
             $startOfYear = $now->copy()->startOfYear()->toDateString();
             $endOfYear   = $now->copy()->endOfYear()->toDateString();
+
+            // Saldo sebelum awal tahun
+            $priorIncome  = (float) CashIncome::whereDate('transaction_date', '<', $startOfYear)->sum('net_amount');
+            $priorOutcome = (float) CashOutcome::whereDate('transaction_date', '<', $startOfYear)->sum('total_amount');
+            $priorSaving  = (float) CashSaving::whereDate('transaction_date', '<', $startOfYear)->sum('amount');
+            $runningBalance = $priorIncome - $priorOutcome - $priorSaving;
 
             $incomes = CashIncome::whereBetween('transaction_date', [$startOfYear, $endOfYear])
                 ->selectRaw('MONTH(transaction_date) as m_idx, SUM(net_amount) as total')
@@ -252,6 +319,12 @@ class DashboardController extends Controller
                 ->pluck('total', 'm_idx')
                 ->all();
 
+            $savings = CashSaving::whereBetween('transaction_date', [$startOfYear, $endOfYear])
+                ->selectRaw('MONTH(transaction_date) as m_idx, SUM(amount) as total')
+                ->groupBy('m_idx')
+                ->pluck('total', 'm_idx')
+                ->all();
+
             $assets = Asset::selectRaw('MONTH(COALESCE(purchase_date, created_at)) as m_idx, SUM(price) as total')
                 ->whereRaw('DATE(COALESCE(purchase_date, created_at)) BETWEEN ? AND ?', [$startOfYear, $endOfYear])
                 ->groupBy('m_idx')
@@ -261,16 +334,31 @@ class DashboardController extends Controller
             $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
             for ($m = 1; $m <= 12; $m++) {
                 $categories[]  = $monthNames[$m - 1];
-                $incomeData[]  = (float) ($incomes[$m] ?? 0);
-                $outcomeData[] = (float) ($outcomes[$m] ?? 0);
-                $assetData[]   = (float) ($assets[$m] ?? 0);
+                $inc = (float) ($incomes[$m] ?? 0);
+                $out = (float) ($outcomes[$m] ?? 0);
+                $sav = (float) ($savings[$m] ?? 0);
+                $ast = (float) ($assets[$m] ?? 0);
+
+                $runningBalance += ($inc - $out - $sav);
+
+                $balanceData[] = $runningBalance;
+                $incomeData[]  = $inc;
+                $outcomeData[] = $out;
+                $assetData[]   = $ast;
             }
         }
+
+        $currentCashBalance = (float) (CashIncome::sum('net_amount') - CashOutcome::sum('total_amount') - CashSaving::sum('amount'));
 
         return [
             'range'      => $range,
             'categories' => $categories,
             'series'     => [
+                [
+                    'name'  => 'Total Saldo',
+                    'color' => '#0ea5e9', // Sky Blue
+                    'data'  => $balanceData,
+                ],
                 [
                     'name'  => 'Pemasukan',
                     'color' => '#10b981', // Hijau
@@ -288,6 +376,7 @@ class DashboardController extends Controller
                 ],
             ],
             'summary' => [
+                'total_balance' => $currentCashBalance,
                 'total_income'  => array_sum($incomeData),
                 'total_outcome' => array_sum($outcomeData),
                 'total_asset'   => array_sum($assetData),

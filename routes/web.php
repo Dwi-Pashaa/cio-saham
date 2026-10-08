@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Pages\AssetController;
 use App\Http\Controllers\Pages\CashIncomeController;
 use App\Http\Controllers\Pages\CashOutcomeController;
+use App\Http\Controllers\Pages\CashSavingController;
 use App\Http\Controllers\Pages\DashboardController;
 use App\Http\Controllers\Pages\InvestmentReportController;
 use App\Http\Controllers\Pages\InvestorDirectoryController;
@@ -50,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
     // Manajemen Saldo Masuk (Pemasukan)
     Route::prefix('cash-incomes')->name('cash-incomes.')->group(function () {
         Route::get('/', [CashIncomeController::class, 'index'])->name('index')->can('lihat pemasukan');
+        Route::get('/export', [CashIncomeController::class, 'export'])->name('export')->can('lihat pemasukan');
         Route::get('/create', [CashIncomeController::class, 'create'])->name('create')->can('tambah pemasukan');
         Route::post('/store', [CashIncomeController::class, 'store'])->name('store')->can('tambah pemasukan');
         Route::get('/{id}', [CashIncomeController::class, 'show'])->name('show')->can('lihat pemasukan');
@@ -61,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
     // Manajemen Saldo Keluar (Pengeluaran)
     Route::prefix('cash-outcomes')->name('cash-outcomes.')->group(function () {
         Route::get('/', [CashOutcomeController::class, 'index'])->name('index')->can('lihat pengeluaran');
+        Route::get('/export', [CashOutcomeController::class, 'export'])->name('export')->can('lihat pengeluaran');
         Route::get('/create', [CashOutcomeController::class, 'create'])->name('create')->can('tambah pengeluaran');
         Route::post('/store', [CashOutcomeController::class, 'store'])->name('store')->can('tambah pengeluaran');
         Route::get('/{id}', [CashOutcomeController::class, 'show'])->name('show')->can('lihat pengeluaran');
@@ -69,9 +72,17 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [CashOutcomeController::class, 'destroy'])->name('destroy')->can('hapus pengeluaran');
     });
 
+    // Manajemen Saldo Tabungan (Pembagian ke Tabungan)
+    Route::prefix('cash-savings')->name('cash-savings.')->group(function () {
+        Route::post('/store', [CashSavingController::class, 'store'])->name('store')->can('bagikan ke tabungan');
+        Route::get('/{id}', [CashSavingController::class, 'show'])->name('show')->can('lihat tabungan');
+        Route::delete('/{id}', [CashSavingController::class, 'destroy'])->name('destroy')->can('hapus tabungan');
+    });
+
     // Manajemen Aset Perusahaan & Investor
     Route::prefix('assets')->name('assets.')->group(function () {
         Route::get('/', [AssetController::class, 'index'])->name('index')->can('lihat aset');
+        Route::get('/export', [AssetController::class, 'export'])->name('export')->can('lihat aset');
         Route::get('/create', [AssetController::class, 'create'])->name('create')->can('tambah aset');
         Route::post('/store', [AssetController::class, 'store'])->name('store')->can('tambah aset');
         Route::get('/{id}', [AssetController::class, 'show'])->name('show')->can('lihat aset');

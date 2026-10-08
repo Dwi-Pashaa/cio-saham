@@ -2,16 +2,36 @@
 
 namespace App\Http\Controllers\Pages;
 
+use App\Exports\AssetExport;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\AssetImage;
 use App\Models\Shareholder;
+use App\Services\CashNotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class AssetController extends Controller
 {
+    /**
+     * Unduh daftar aset inventaris ke format file Excel (.xlsx).
+     */
+    public function export(Request $request)
+    {
+        $fileName = 'inventaris_aset_pt_cio_' . date('Ymd_His') . '.xlsx';
+        return Excel::download(
+            new AssetExport(
+                $request->type,
+                $request->owner_type,
+                $request->start_date,
+                $request->end_date
+            ),
+            $fileName
+        );
+    }
     /**
      * Tampilkan daftar dan ringkasan metrik inventaris aset.
      */
@@ -269,6 +289,13 @@ class AssetController extends Controller
                     'is_primary' => $index === 0,
                 ]);
             }
+        }
+
+        // Kirim Notifikasi WhatsApp Otomatis ke Manajemen & Investor
+        try {
+            app(CashNotificationService::class)->notifyAssetCreated($asset);
+        } catch (\Throwable $e) {
+            Log::error('[AssetController] Gagal mengirim notifikasi WA penambahan aset: ' . $e->getMessage());
         }
 
         if ($request->ajax() || $request->wantsJson()) {
