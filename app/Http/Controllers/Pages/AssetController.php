@@ -9,6 +9,7 @@ use App\Models\AssetImage;
 use App\Models\Shareholder;
 use App\Services\CashNotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -228,6 +229,44 @@ class AssetController extends Controller
     }
 
     /**
+     * Konversi format nominal rupiah/angka menjadi float terstandarisasi.
+     */
+    private function parsePrice($price): float
+    {
+        if (is_numeric($price)) {
+            return (float) $price;
+        }
+
+        $cleaned = trim((string) $price);
+        $cleaned = preg_replace('/[^\d.,]/', '', $cleaned);
+
+        if (empty($cleaned)) {
+            return 0.0;
+        }
+
+        if (str_contains($cleaned, '.') && str_contains($cleaned, ',')) {
+            if (strrpos($cleaned, ',') > strrpos($cleaned, '.')) {
+                $cleaned = str_replace('.', '', $cleaned);
+                $cleaned = str_replace(',', '.', $cleaned);
+            } else {
+                $cleaned = str_replace(',', '', $cleaned);
+            }
+        } elseif (str_contains($cleaned, '.')) {
+            if (substr_count($cleaned, '.') > 1 || preg_match('/\.\d{3}$/', $cleaned)) {
+                $cleaned = str_replace('.', '', $cleaned);
+            }
+        } elseif (str_contains($cleaned, ',')) {
+            if (substr_count($cleaned, ',') > 1 || preg_match('/,\d{3}$/', $cleaned)) {
+                $cleaned = str_replace(',', '', $cleaned);
+            } else {
+                $cleaned = str_replace(',', '.', $cleaned);
+            }
+        }
+
+        return (float) $cleaned;
+    }
+
+    /**
      * Simpan data aset baru beserta upload multiple image.
      */
     public function store(Request $request)
@@ -250,7 +289,27 @@ class AssetController extends Controller
             'images.*.max'      => 'Ukuran masing-masing foto aset tidak boleh melebihi 5MB.',
         ]);
 
-        $rawPrice = (float) str_replace(['.', ','], ['', '.'], str_replace(['Rp', ' ', '.'], '', (string) $request->price));
+        $rawPrice = $this->parsePrice($request->price);
+
+        // Pencegahan Duplikasi: Cek apakah data aset serupa baru saja disimpan dalam kurun waktu 20 detik terakhir oleh user ini
+        $recentDuplicate = Asset::where('name', $request->name)
+            ->where('type', $request->type)
+            ->where('price', $rawPrice)
+            ->where('created_by', auth()->id())
+            ->where('created_at', '>=', now()->subSeconds(20))
+            ->first();
+
+        if ($recentDuplicate) {
+            Log::info("[AssetController] Mencegah input duplikat aset: ID {$recentDuplicate->id} ({$recentDuplicate->name})");
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'Data aset berhasil disimpan (duplikasi input otomatis dicegah).',
+                    'data'    => $recentDuplicate->load('images'),
+                ]);
+            }
+            return redirect()->route('assets.index')->with('success', 'Data aset berhasil ditambahkan ke inventaris.');
+        }
 
         $canManageOwner = $request->user()->can('atur pemilik aset');
 
@@ -266,30 +325,34 @@ class AssetController extends Controller
             $ownerName = 'PT CIO NETWORK SOLUTION';
         }
 
-        $asset = Asset::create([
-            'name'           => $request->name,
-            'type'           => $request->type,
-            'price'          => $rawPrice,
-            'serial_number'  => $request->serial_number ?: null,
-            'mac_address'    => $request->mac_address ?: null,
-            'owner_type'     => $ownerType,
-            'shareholder_id' => $shareholderId,
-            'owner_name'     => $ownerName,
-            'purchase_date'  => $request->purchase_date ?: null,
-            'notes'          => $request->notes ?: null,
-            'created_by'     => auth()->id(),
-        ]);
+        $asset = DB::transaction(function () use ($request, $rawPrice, $ownerType, $shareholderId, $ownerName) {
+            $created = Asset::create([
+                'name'           => $request->name,
+                'type'           => $request->type,
+                'price'          => $rawPrice,
+                'serial_number'  => $request->serial_number ?: null,
+                'mac_address'    => $request->mac_address ?: null,
+                'owner_type'     => $ownerType,
+                'shareholder_id' => $shareholderId,
+                'owner_name'     => $ownerName,
+                'purchase_date'  => $request->purchase_date ?: null,
+                'notes'          => $request->notes ?: null,
+                'created_by'     => auth()->id(),
+            ]);
 
-        // Simpan multiple images jika ada diupload
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $file) {
-                $path = $file->store('assets/images', 'public');
-                $asset->images()->create([
-                    'image_path' => $path,
-                    'is_primary' => $index === 0,
-                ]);
+            // Simpan multiple images jika ada diupload
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $index => $file) {
+                    $path = $file->store('assets/images', 'public');
+                    $created->images()->create([
+                        'image_path' => $path,
+                        'is_primary' => $index === 0,
+                    ]);
+                }
             }
-        }
+
+            return $created;
+        });
 
         // Kirim Notifikasi WhatsApp Otomatis ke Manajemen & Investor
         try {
@@ -314,7 +377,17 @@ class AssetController extends Controller
      */
     public function show(Request $request, $id)
     {
-        $asset = Asset::with(['shareholder', 'creator', 'images'])->findOrFail($id);
+        $asset = Asset::with(['shareholder', 'creator', 'images'])->find($id);
+
+        if (!$asset) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Data aset tidak ditemukan atau sudah dihapus.'
+                ], 404);
+            }
+            abort(404, 'Data aset tidak ditemukan.');
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -354,7 +427,17 @@ class AssetController extends Controller
      */
     public function edit(Request $request, $id)
     {
-        $asset = Asset::with(['shareholder', 'images'])->findOrFail($id);
+        $asset = Asset::with(['shareholder', 'images'])->find($id);
+
+        if (!$asset) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Data aset tidak ditemukan atau sudah dihapus.'
+                ], 404);
+            }
+            abort(404, 'Data aset tidak ditemukan.');
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -419,63 +502,72 @@ class AssetController extends Controller
             'images.*.max'      => 'Ukuran masing-masing foto aset tidak boleh melebihi 5MB.',
         ]);
 
-        $rawPrice = (float) str_replace(['.', ','], ['', '.'], str_replace(['Rp', ' ', '.'], '', (string) $request->price));
+        $rawPrice = $this->parsePrice($request->price);
 
         $canManageOwner = $request->user()->can('atur pemilik aset');
 
-        if ($canManageOwner && $request->owner_type === 'shareholder' && $request->filled('shareholder_id')) {
-            $shareholder = Shareholder::find($request->shareholder_id);
-            $ownerType = 'shareholder';
-            $shareholderId = $shareholder?->id;
-            $ownerName = $shareholder ? $shareholder->name : 'Investor';
+        if ($canManageOwner) {
+            if ($request->owner_type === 'shareholder' && $request->filled('shareholder_id')) {
+                $shareholder = Shareholder::find($request->shareholder_id);
+                $ownerType = 'shareholder';
+                $shareholderId = $shareholder?->id;
+                $ownerName = $shareholder ? $shareholder->name : 'Investor';
+            } else {
+                // Default jika memilih PT
+                $ownerType = 'pt';
+                $shareholderId = null;
+                $ownerName = 'PT CIO NETWORK SOLUTION';
+            }
         } else {
-            // Default mutlak jika tidak memiliki izin atur pemilik aset atau memilih PT
-            $ownerType = 'pt';
-            $shareholderId = null;
-            $ownerName = 'PT CIO NETWORK SOLUTION';
+            // Pertahankan kepemilikan sebelumnya jika user tidak punya izin ubah pemilik aset
+            $ownerType = $asset->owner_type;
+            $shareholderId = $asset->shareholder_id;
+            $ownerName = $asset->owner_name;
         }
 
-        $asset->update([
-            'name'           => $request->name,
-            'type'           => $request->type,
-            'price'          => $rawPrice,
-            'serial_number'  => $request->serial_number ?: null,
-            'mac_address'    => $request->mac_address ?: null,
-            'owner_type'     => $ownerType,
-            'shareholder_id' => $shareholderId,
-            'owner_name'     => $ownerName,
-            'purchase_date'  => $request->purchase_date ?: null,
-            'notes'          => $request->notes ?: null,
-        ]);
+        DB::transaction(function () use ($asset, $request, $rawPrice, $ownerType, $shareholderId, $ownerName) {
+            $asset->update([
+                'name'           => $request->name,
+                'type'           => $request->type,
+                'price'          => $rawPrice,
+                'serial_number'  => $request->serial_number ?: null,
+                'mac_address'    => $request->mac_address ?: null,
+                'owner_type'     => $ownerType,
+                'shareholder_id' => $shareholderId,
+                'owner_name'     => $ownerName,
+                'purchase_date'  => $request->purchase_date ?: null,
+                'notes'          => $request->notes ?: null,
+            ]);
 
-        // Hapus foto yang ditandai untuk dihapus
-        if ($request->filled('deleted_image_ids')) {
-            $deletedIds = is_array($request->deleted_image_ids) 
-                ? $request->deleted_image_ids 
-                : explode(',', (string) $request->deleted_image_ids);
+            // Hapus foto yang ditandai untuk dihapus
+            if ($request->filled('deleted_image_ids')) {
+                $deletedIds = is_array($request->deleted_image_ids) 
+                    ? $request->deleted_image_ids 
+                    : explode(',', (string) $request->deleted_image_ids);
 
-            foreach ($asset->images()->whereIn('id', $deletedIds)->get() as $img) {
-                $img->delete();
+                foreach ($asset->images()->whereIn('id', $deletedIds)->get() as $img) {
+                    $img->delete();
+                }
             }
-        }
 
-        // Upload foto baru jika ada
-        if ($request->hasFile('images')) {
-            $hasPrimary = $asset->images()->where('is_primary', true)->exists();
-            foreach ($request->file('images') as $index => $file) {
-                $path = $file->store('assets/images', 'public');
-                $asset->images()->create([
-                    'image_path' => $path,
-                    'is_primary' => !$hasPrimary && $index === 0,
-                ]);
+            // Upload foto baru jika ada
+            if ($request->hasFile('images')) {
+                $hasPrimary = $asset->images()->where('is_primary', true)->exists();
+                foreach ($request->file('images') as $index => $file) {
+                    $path = $file->store('assets/images', 'public');
+                    $asset->images()->create([
+                        'image_path' => $path,
+                        'is_primary' => !$hasPrimary && $index === 0,
+                    ]);
+                }
             }
-        }
+        });
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Data aset berhasil diperbarui.',
-                'data'    => $asset->load('images'),
+                'data'    => $asset->fresh(['images', 'shareholder']),
             ]);
         }
 

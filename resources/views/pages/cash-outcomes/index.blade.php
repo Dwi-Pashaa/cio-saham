@@ -21,6 +21,7 @@
 <div class="container-xl py-2">
 
     @include('components.alert.success')
+    @include('components.alert.danger')
 
     @if ($errors->any())
         <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-3" role="alert">
@@ -172,6 +173,22 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4 bg-white">
+                    <!-- Info Banner Sisa Saldo Kas Aktif -->
+                    <div class="p-3 mb-3 border rounded-3 d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.02)); border-color: rgba(239, 68, 68, 0.2) !important;">
+                        <div class="d-flex align-items-center gap-2.5">
+                            <span class="badge bg-danger text-white p-2 rounded-circle">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 8l.01 0" /><path d="M11 12l1 0l0 4l1 0" /></svg>
+                            </span>
+                            <div>
+                                <div class="small text-muted" style="font-size: 0.75rem;">Sisa Saldo Kas Aktif Saat Ini</div>
+                                <div class="fw-bold font-monospace text-danger fs-3" id="display_max_outcome_balance" data-max="{{ $currentCashBalance ?? 0 }}">
+                                    Rp {{ number_format($currentCashBalance ?? 0, 0, ',', '.') }}
+                                </div>
+                            </div>
+                        </div>
+                        <span class="badge bg-red-lt font-monospace text-danger fw-bold">Batas Pengeluaran</span>
+                    </div>
+
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label required fw-semibold text-dark">Rekening Tujuan (Atas Nama Penerima)</label>
@@ -243,6 +260,10 @@
                                     <div class="text-end text-muted small font-monospace">
                                         <span id="calc_gross_add_out">Rp 0</span> (Pokok) + <span id="calc_fee_add_out" class="text-warning">Rp 0</span> (Admin)
                                     </div>
+                                </div>
+                                <div id="warning_over_balance_add_out" class="text-danger small fw-bold mt-2 pt-1 border-top border-danger-subtle d-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4" /><path d="M12 17h.01" /><path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" /></svg>
+                                    Perhatian: Total pengeluaran melebihi sisa saldo kas aktif yang tersedia!
                                 </div>
                             </div>
                         </div>
@@ -343,6 +364,22 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4 bg-white">
+                    <!-- Info Banner Batas Maksimal Pengeluaran -->
+                    <div class="p-3 mb-3 border rounded-3 d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, rgba(32, 107, 196, 0.05), rgba(32, 107, 196, 0.02)); border-color: rgba(32, 107, 196, 0.2) !important;">
+                        <div class="d-flex align-items-center gap-2.5">
+                            <span class="badge bg-primary text-white p-2 rounded-circle">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 8l.01 0" /><path d="M11 12l1 0l0 4l1 0" /></svg>
+                            </span>
+                            <div>
+                                <div class="small text-muted" style="font-size: 0.75rem;">Batas Saldo Kas Tersedia (Termasuk Nilai Transaksi Ini)</div>
+                                <div class="fw-bold font-monospace text-primary fs-3" id="edit_display_max_outcome_balance" data-max="0">
+                                    Rp 0
+                                </div>
+                            </div>
+                        </div>
+                        <span class="badge bg-azure-lt font-monospace text-azure fw-bold">Batas Maksimal</span>
+                    </div>
+
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label required fw-semibold text-dark">Rekening Tujuan (Atas Nama Penerima)</label>
@@ -413,6 +450,10 @@
                                         <span id="calc_gross_edit_out">Rp 0</span> (Pokok) + <span id="calc_fee_edit_out" class="text-warning">Rp 0</span> (Admin)
                                     </div>
                                 </div>
+                                <div id="warning_over_balance_edit_out" class="text-danger small fw-bold mt-2 pt-1 border-top border-danger-subtle d-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 9v4" /><path d="M12 17h.01" /><path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75" /></svg>
+                                    Perhatian: Total pengeluaran melebihi batas saldo kas yang tersedia!
+                                </div>
                             </div>
                         </div>
 
@@ -472,6 +513,16 @@
         $('#calc_gross_' + prefix).text(formatRupiahDisplay(gross));
         $('#calc_fee_' + prefix).text(formatRupiahDisplay(fee));
         $('#calc_total_' + prefix).text(formatRupiahDisplay(total));
+
+        let maxBal = prefix === 'add_out' 
+            ? parseFloat($('#display_max_outcome_balance').data('max') || 0)
+            : parseFloat($('#edit_display_max_outcome_balance').data('max') || 0);
+
+        if (total > maxBal && total > 0) {
+            $('#warning_over_balance_' + prefix).removeClass('d-none');
+        } else {
+            $('#warning_over_balance_' + prefix).addClass('d-none');
+        }
     }
 
     function setFeeModeOutcome(prefix, hasFee) {
@@ -834,6 +885,10 @@
                         $('#edit_out_admin_fee').val('0');
                     }
 
+                    if (data.formatted_max_balance) {
+                        $('#edit_display_max_outcome_balance').text(data.formatted_max_balance).data('max', data.current_cash_balance || 0);
+                    }
+
                     updateLiveCalculationOutcome('edit_out');
 
                     if (data.proof_url) {
@@ -908,6 +963,64 @@
             if (endDate) params.set('end_date', endDate);
             const query = params.toString();
             $(this).attr('href', query ? `${baseUrl}?${query}` : baseUrl);
+        });
+
+        // Validasi Saldo Kas saat Submit Form Tambah Pengeluaran
+        $('#formAddOutcome').on('submit', function (e) {
+            let maxBal = parseFloat($('#display_max_outcome_balance').data('max') || 0);
+            let rawAmount = parseFloat($('#add_out_amount').val().replace(/\./g, '')) || 0;
+            let hasAdmin = $('#has_admin_fee_add_out').val() === 'ya';
+            let adminFee = hasAdmin ? (parseFloat($('#add_out_admin_fee').val().replace(/\./g, '')) || 0) : 0;
+            let total = rawAmount + adminFee;
+
+            if (total <= 0) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Nominal Tidak Valid',
+                    text: 'Masukkan nominal pengeluaran yang lebih besar dari Rp 0.'
+                });
+                return false;
+            }
+
+            if (total > maxBal) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Saldo Kas Tidak Mencukupi!',
+                    html: 'Total pengeluaran (<strong>Rp ' + total.toLocaleString('id-ID') + '</strong>) melebihi sisa saldo kas aktif yang tersedia (<strong>Rp ' + maxBal.toLocaleString('id-ID') + '</strong>).<br><br>Transaksi pengeluaran tidak dapat dilakukan.'
+                });
+                return false;
+            }
+        });
+
+        // Validasi Saldo Kas saat Submit Form Edit Pengeluaran
+        $('#formEditOutcome').on('submit', function (e) {
+            let maxBal = parseFloat($('#edit_display_max_outcome_balance').data('max') || 0);
+            let rawAmount = parseFloat($('#edit_out_amount').val().replace(/\./g, '')) || 0;
+            let hasAdmin = $('#has_admin_fee_edit_out').val() === 'ya';
+            let adminFee = hasAdmin ? (parseFloat($('#edit_out_admin_fee').val().replace(/\./g, '')) || 0) : 0;
+            let total = rawAmount + adminFee;
+
+            if (total <= 0) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Nominal Tidak Valid',
+                    text: 'Masukkan nominal pengeluaran yang lebih besar dari Rp 0.'
+                });
+                return false;
+            }
+
+            if (total > maxBal) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Saldo Kas Tidak Mencukupi!',
+                    html: 'Total pengeluaran (<strong>Rp ' + total.toLocaleString('id-ID') + '</strong>) melebihi batas saldo kas yang tersedia (<strong>Rp ' + maxBal.toLocaleString('id-ID') + '</strong>).<br><br>Pembaruan pengeluaran tidak dapat disimpan.'
+                });
+                return false;
+            }
         });
     });
 </script>

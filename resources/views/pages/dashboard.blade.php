@@ -825,40 +825,111 @@
                             </div>
 
                             <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label required fw-semibold text-dark">Tanggal Alokasi</label>
-                                    <input type="date" name="transaction_date" class="form-control font-monospace" value="{{ date('Y-m-d') }}" required>
-                                </div>
+                                @if(!$isAdmin && !empty($defaultSavingsAccount['is_configured']))
+                                    {{-- KONDISI BUKAN ADMIN: Data rekening otomatis terisi dan terkunci (Tersimpan) --}}
+                                    <input type="hidden" name="recipient_name" value="{{ $defaultSavingsAccount['recipient_name'] }}">
+                                    <input type="hidden" name="bank_name" value="{{ $defaultSavingsAccount['bank_name'] }}">
+                                    <input type="hidden" name="account_number" value="{{ $defaultSavingsAccount['account_number'] }}">
 
-                                <div class="col-md-6">
-                                    <label class="form-label required fw-semibold text-dark">Nama Penerima / Rekening Tabungan</label>
-                                    <input type="text" name="recipient_name" class="form-control" required placeholder="Contoh: Rekening Tabungan PT CIO / Yoga">
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label required fw-semibold text-dark">Pilihan Bank</label>
-                                    <select name="bank_name" id="saving_bank_select" class="form-select" required>
-                                        <option value="">-- Pilih Bank Tujuan --</option>
-                                        @if(isset($banksGrouped))
-                                            @foreach($banksGrouped as $category => $banks)
-                                                <optgroup label="{{ $category }}">
-                                                    @foreach($banks as $b)
-                                                        <option value="{{ $b['name'] }}">{{ $b['name'] }}</option>
-                                                    @endforeach
-                                                </optgroup>
-                                            @endforeach
-                                        @endif
-                                        <option value="other">Bank Lainnya (Input Manual)...</option>
-                                    </select>
-                                    <div id="saving_other_bank_wrapper" class="mt-2" style="display: none;">
-                                        <input type="text" id="saving_other_bank_input" class="form-control" placeholder="Ketik nama bank tujuan...">
+                                    <div class="col-12">
+                                        <div class="border rounded-3 p-3 bg-azure-lt border-azure-subtle shadow-xs">
+                                            <div class="d-flex align-items-center justify-content-between mb-2 pb-1 border-bottom border-azure-subtle">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="badge bg-azure text-white p-1 rounded-circle">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
+                                                    </span>
+                                                    <span class="fw-bold text-dark" style="font-size: 0.82rem;">Rekening Tabungan Tujuan (Otomatis &amp; Tersimpan)</span>
+                                                </div>
+                                                <span class="badge bg-azure text-white font-monospace" style="font-size: 0.7rem;">Tersimpan</span>
+                                            </div>
+                                            <div class="row g-2">
+                                                <div class="col-md-5">
+                                                    <div class="text-muted small" style="font-size: 0.72rem;">Nama Pemilik / Penerima Tabungan:</div>
+                                                    <div class="fw-bold text-dark fs-4">{{ $defaultSavingsAccount['recipient_name'] }}</div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="text-muted small" style="font-size: 0.72rem;">Bank Tujuan:</div>
+                                                    <span class="badge bg-white text-dark border font-monospace px-2.5 py-1 fw-bold fs-4">{{ $defaultSavingsAccount['bank_name'] }}</span>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="text-muted small" style="font-size: 0.72rem;">Nomor Rekening:</div>
+                                                    <div class="font-monospace fw-bold text-dark fs-4">{{ $defaultSavingsAccount['account_number'] ?: '-' }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="text-muted small mt-2 pt-2 border-top border-azure-subtle d-flex align-items-center gap-1" style="font-size: 0.72rem;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 8l.01 0" /><path d="M11 12l1 0l0 4l1 0" /></svg>
+                                                <span>Rekening tujuan tabungan telah ditetapkan. Silakan <strong>langsung masukkan nominal alokasi tabungan</strong> di bawah.</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-dark">Nomor Rekening (Opsional)</label>
-                                    <input type="text" name="account_number" class="form-control font-monospace" placeholder="Contoh: 7128912345">
-                                </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label required fw-semibold text-dark">Tanggal Alokasi</label>
+                                        <input type="date" name="transaction_date" class="form-control font-monospace" value="{{ date('Y-m-d') }}" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-dark">Catatan / Pos Tabungan</label>
+                                        <input type="text" name="notes" class="form-control" placeholder="Contoh: Dana cadangan ekspansi, kas darurat, dll">
+                                    </div>
+                                @else
+                                    {{-- KONDISI ADMIN (Bisa Ubah-Ubah) ATAU Rekening Belum Pernah Tersimpan --}}
+                                    @if($isAdmin)
+                                        <div class="col-12">
+                                            <div class="alert alert-info py-2 px-3 mb-1 d-flex align-items-center justify-content-between" style="border-radius: 8px; font-size: 0.76rem;">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9h.01" /><path d="M11 12h1v4h1" /></svg>
+                                                    <span><strong>Mode Administrator:</strong> Data rekening terisi otomatis dan dapat Anda ubah kapan saja. Perubahan akan disimpan untuk alokasi berikutnya.</span>
+                                                </div>
+                                                <span class="badge bg-primary text-white font-monospace">Bisa Ubah</span>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required fw-semibold text-dark">Tanggal Alokasi</label>
+                                        <input type="date" name="transaction_date" class="form-control font-monospace" value="{{ date('Y-m-d') }}" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required fw-semibold text-dark">Nama Penerima / Rekening Tabungan</label>
+                                        <input type="text" name="recipient_name" class="form-control" required placeholder="Contoh: Rekening Tabungan PT CIO / Yoga" value="{{ old('recipient_name', $defaultSavingsAccount['recipient_name'] ?? '') }}">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label required fw-semibold text-dark">Pilihan Bank</label>
+                                        <select name="bank_name" id="saving_bank_select" class="form-select" required>
+                                            <option value="">-- Pilih Bank Tujuan --</option>
+                                            @php
+                                                $selectedBank = old('bank_name', $defaultSavingsAccount['bank_name'] ?? '');
+                                                $isPresetBank = false;
+                                            @endphp
+                                            @if(isset($banksGrouped))
+                                                @foreach($banksGrouped as $category => $banks)
+                                                    <optgroup label="{{ $category }}">
+                                                        @foreach($banks as $b)
+                                                            @php
+                                                                if ($selectedBank === $b['name']) {
+                                                                    $isPresetBank = true;
+                                                                }
+                                                            @endphp
+                                                            <option value="{{ $b['name'] }}" {{ $selectedBank === $b['name'] ? 'selected' : '' }}>{{ $b['name'] }}</option>
+                                                        @endforeach
+                                                    </optgroup>
+                                                @endforeach
+                                            @endif
+                                            <option value="other" {{ (!$isPresetBank && !empty($selectedBank)) ? 'selected' : '' }}>Bank Lainnya (Input Manual)...</option>
+                                        </select>
+                                        <div id="saving_other_bank_wrapper" class="mt-2" style="{{ (!$isPresetBank && !empty($selectedBank)) ? 'display: block;' : 'display: none;' }}">
+                                            <input type="text" id="saving_other_bank_input" class="form-control" placeholder="Ketik nama bank tujuan..." value="{{ (!$isPresetBank && !empty($selectedBank)) ? $selectedBank : '' }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-dark">Nomor Rekening (Opsional)</label>
+                                        <input type="text" name="account_number" class="form-control font-monospace" placeholder="Contoh: 7128912345" value="{{ old('account_number', $defaultSavingsAccount['account_number'] ?? '') }}">
+                                    </div>
+                                @endif
 
                                 <div class="col-12">
                                     <label class="form-label required fw-semibold text-dark d-flex justify-content-between align-items-center">
@@ -886,10 +957,12 @@
                                     <small class="text-muted" style="font-size: 0.7rem;">Maksimal 5MB (JPG, PNG, WEBP, PDF)</small>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold text-dark">Catatan / Pos Tabungan</label>
-                                    <input type="text" name="notes" class="form-control" placeholder="Contoh: Dana cadangan ekspansi, kas darurat, dll">
-                                </div>
+                                @if($isAdmin || empty($defaultSavingsAccount['is_configured']))
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-dark">Catatan / Pos Tabungan</label>
+                                        <input type="text" name="notes" class="form-control" placeholder="Contoh: Dana cadangan ekspansi, kas darurat, dll">
+                                    </div>
+                                @endif
                             </div>
                         </div>
                         <div class="modal-footer bg-light py-2.5 px-4 d-flex justify-content-between">
@@ -1035,6 +1108,17 @@
                 });
             }
 
+            // Auto-focus input nominal saat modal dibuka
+            var modalBagikanEl = document.getElementById('modalBagikanTabungan');
+            if (modalBagikanEl) {
+                modalBagikanEl.addEventListener('shown.bs.modal', function () {
+                    if (amountInput) {
+                        amountInput.focus();
+                        amountInput.select();
+                    }
+                });
+            }
+
             // AJAX Submit Form Bagikan Tabungan
             var formBagikan = document.getElementById('formBagikanTabungan');
             if (formBagikan) {
@@ -1076,7 +1160,7 @@
                     }).then(function (result) {
                         if (result.isConfirmed) {
                             var formData = new FormData(formBagikan);
-                            if (bankSelect.value === 'other' && otherBankInput.value.trim() !== '') {
+                            if (bankSelect && bankSelect.value === 'other' && otherBankInput && otherBankInput.value.trim() !== '') {
                                 formData.set('bank_name', otherBankInput.value.trim());
                             }
 

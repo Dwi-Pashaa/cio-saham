@@ -7,6 +7,7 @@ use App\Models\Asset;
 use App\Models\CashIncome;
 use App\Models\CashOutcome;
 use App\Models\CashSaving;
+use App\Models\Setting;
 use App\Models\Shareholder;
 use App\Services\ShareholderService;
 use App\Services\XenditService;
@@ -48,6 +49,8 @@ class DashboardController extends Controller
 
         $newSavingTransactionNumber = CashSaving::generateTransactionNumber();
         $banksGrouped = XenditService::getSupportedBanks();
+        $isAdmin = $user ? $user->hasRole('Admin') : false;
+        $defaultSavingsAccount = Setting::getDefaultSavingsAccount();
 
         // Data Grafik Finansial & Asset (30 hari terakhir sebagai default)
         $chartData = $this->getFinanceChartData('30d');
@@ -123,7 +126,9 @@ class DashboardController extends Controller
             'endDate',
             'savingsLogs',
             'newSavingTransactionNumber',
-            'banksGrouped'
+            'banksGrouped',
+            'isAdmin',
+            'defaultSavingsAccount'
         ));
     }
 

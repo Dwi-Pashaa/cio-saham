@@ -9,7 +9,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-9 col-md-11">
 
-            @include('components.alert.error')
+            @include('components.alert.danger')
 
             <div class="card shadow-sm border-0 rounded-3">
                 <div class="card-header py-3.5 px-4 bg-white border-bottom">
@@ -30,6 +30,22 @@
                 <form action="{{ route('cash-outcomes.store') }}" method="POST" enctype="multipart/form-data" id="form-outcome">
                     @csrf
                     <div class="card-body p-4">
+                        <!-- Info Banner Sisa Saldo Kas Aktif -->
+                        <div class="p-3 mb-3 border rounded-3 d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.02)); border-color: rgba(239, 68, 68, 0.2) !important;">
+                            <div class="d-flex align-items-center gap-2.5">
+                                <span class="badge bg-danger text-white p-2 rounded-circle">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 8l.01 0" /><path d="M11 12l1 0l0 4l1 0" /></svg>
+                                </span>
+                                <div>
+                                    <div class="small text-muted" style="font-size: 0.75rem;">Sisa Saldo Kas Aktif Saat Ini</div>
+                                    <div class="fw-bold font-monospace text-danger fs-3" id="display_max_outcome_balance" data-max="{{ $currentCashBalance ?? 0 }}">
+                                        Rp {{ number_format($currentCashBalance ?? 0, 0, ',', '.') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="badge bg-red-lt font-monospace text-danger fw-bold">Batas Pengeluaran</span>
+                        </div>
+
                         <div class="row g-3">
                             <!-- 1. Tanggal Transaksi -->
                             <div class="col-md-6">
@@ -287,5 +303,32 @@
             }
         }
     }
+
+    document.getElementById('form-outcome')?.addEventListener('submit', function (e) {
+        const maxBal = parseFloat(document.getElementById('display_max_outcome_balance')?.dataset.max || 0);
+        const amount = parseFloat(document.getElementById('amount')?.value || 0);
+        const admin = parseFloat(document.getElementById('admin_fee')?.value || 0);
+        const total = amount + admin;
+
+        if (total <= 0) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Nominal Tidak Valid',
+                text: 'Masukkan nominal pengeluaran yang lebih besar dari Rp 0.'
+            });
+            return false;
+        }
+
+        if (total > maxBal) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Saldo Kas Tidak Mencukupi!',
+                html: 'Total pengeluaran (<strong>Rp ' + total.toLocaleString('id-ID') + '</strong>) melebihi sisa saldo kas aktif yang tersedia (<strong>Rp ' + maxBal.toLocaleString('id-ID') + '</strong>).<br><br>Transaksi pengeluaran tidak dapat dilakukan.'
+            });
+            return false;
+        }
+    });
 </script>
 @endpush

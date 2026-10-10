@@ -41,7 +41,7 @@
                 <p class="text-muted small mb-0 mt-0.5">Perbarui informasi teknis, nilai buku, foto dokumentasi, atau status kepemilikan aset</p>
             </div>
         </div>
-        <form action="{{ route('assets.update', $asset->id) }}" method="POST" enctype="multipart/form-data">
+        <form id="formEditStandaloneAsset" action="{{ route('assets.update', $asset->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="card-body p-4">
@@ -218,7 +218,7 @@
             </div>
             <div class="card-footer bg-light py-3 px-4 d-flex align-items-center justify-content-between">
                 <a href="{{ route('assets.index') }}" class="btn btn-ghost-secondary px-3">Batal</a>
-                <button type="submit" class="btn btn-warning px-4 shadow-sm d-inline-flex align-items-center gap-1.5">
+                <button type="submit" id="btnSubmitEditStandaloneAsset" class="btn btn-warning px-4 shadow-sm d-inline-flex align-items-center gap-1.5">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg>
                     <span class="fw-semibold text-dark">Perbarui Data Aset</span>
                 </button>
@@ -279,6 +279,15 @@ $(document).ready(function () {
             $('.shareholder-select-wrap').addClass('d-none');
             $('.select-shareholder').prop('required', false);
         }
+    });
+
+    // Cegah double submit formulir edit
+    var isSubmitting = false;
+    $('#formEditStandaloneAsset').on('submit', function () {
+        if (isSubmitting) return false;
+        isSubmitting = true;
+        var btn = $('#btnSubmitEditStandaloneAsset');
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1.5" role="status" aria-hidden="true"></span><span class="fw-semibold text-dark">Memperbarui...</span>');
     });
 });
 </script>

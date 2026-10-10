@@ -22,7 +22,10 @@ class Setting extends Model
         'cio_finance_timeout',
         'xendit_secret_key', 
         'xendit_webhook_token', 
-        'dashboard_columns'
+        'dashboard_columns',
+        'savings_recipient_name',
+        'savings_bank_name',
+        'savings_account_number',
     ];
     protected $casts = [
         'dashboard_columns'   => 'array',
@@ -54,4 +57,39 @@ class Setting extends Model
 
         return $defaults;
     }
+
+    /**
+     * Ambil data rekening tabungan default yang tersimpan.
+     * Fallback ke transaksi alokasi tabungan terakhir jika belum disimpan di settings.
+     */
+    public static function getDefaultSavingsAccount(): array
+    {
+        $setting = self::first();
+        if ($setting && !empty($setting->savings_recipient_name)) {
+            return [
+                'recipient_name' => $setting->savings_recipient_name,
+                'bank_name'      => $setting->savings_bank_name ?? '',
+                'account_number' => $setting->savings_account_number ?? '',
+                'is_configured'  => true,
+            ];
+        }
+
+        $latestSaving = CashSaving::latest('id')->first();
+        if ($latestSaving) {
+            return [
+                'recipient_name' => $latestSaving->recipient_name,
+                'bank_name'      => $latestSaving->bank_name,
+                'account_number' => $latestSaving->account_number ?? '',
+                'is_configured'  => true,
+            ];
+        }
+
+        return [
+            'recipient_name' => '',
+            'bank_name'      => '',
+            'account_number' => '',
+            'is_configured'  => false,
+        ];
+    }
 }
+

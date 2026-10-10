@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Pages;
 
 use App\Exports\CashOutcomeExport;
 use App\Http\Controllers\Controller;
+use App\Models\CashIncome;
 use App\Models\CashOutcome;
+use App\Models\CashSaving;
 use App\Services\CashNotificationService;
 use App\Services\XenditService;
 use Illuminate\Http\Request;
@@ -28,6 +30,17 @@ class CashOutcomeController extends Controller
             ),
             $fileName
         );
+    }
+
+    /**
+     * Hitung sisa saldo kas aktif operasional saat ini (Pemasukan Bersih - Pengeluaran - Tabungan).
+     */
+    protected function getCurrentCashBalance(): float
+    {
+        $totalIncome  = (float) CashIncome::sum('net_amount');
+        $totalOutcome = (float) CashOutcome::sum('total_amount');
+        $totalSavings = (float) CashSaving::sum('amount');
+        return $totalIncome - $totalOutcome - $totalSavings;
     }
 
     public function index(Request $request)
@@ -147,6 +160,7 @@ class CashOutcomeController extends Controller
                 ->make(true);
         }
 
+        $currentCashBalance = $this->getCurrentCashBalance();
         $banksGrouped = XenditService::getSupportedBanks();
         $transactionNumber = CashOutcome::generateTransactionNumber();
 
@@ -156,15 +170,17 @@ class CashOutcomeController extends Controller
             'totalOverallSum',
             'totalCount',
             'banksGrouped',
-            'transactionNumber'
+            'transactionNumber',
+            'currentCashBalance'
         ));
     }
 
     public function create()
     {
+        $currentCashBalance = $this->getCurrentCashBalance();
         $transactionNumber = CashOutcome::generateTransactionNumber();
         $banksGrouped = XenditService::getSupportedBanks();
-        return view('pages.cash-outcomes.create', compact('transactionNumber', 'banksGrouped'));
+        return view('pages.cash-outcomes.create', compact('transactionNumber', 'banksGrouped', 'currentCashBalance'));
     }
 
     public function store(Request $request)
@@ -195,6 +211,14 @@ class CashOutcomeController extends Controller
         ]);
 
         $rawAmount = (float) str_replace(['.', ','], ['', '.'], str_replace(['Rp', ' ', '.'], '', $request->amount));
+        if ($rawAmount <= 0) {
+            $msg = 'Nominal pengeluaran harus lebih besar dari Rp 0.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['status' => 'error', 'message' => $msg], 422);
+            }
+            return back()->with('error', $msg)->withInput();
+        }
+
         $hasAdmin  = in_array($request->has_admin_fee, ['ya', '1', 1, true], true);
         
         $rawAdminFee = 0;
@@ -203,6 +227,23 @@ class CashOutcomeController extends Controller
         }
 
         $totalAmount = $rawAmount + $rawAdminFee;
+
+        // Cek ketersediaan saldo kas aktif saat ini
+        $currentCashBalance = $this->getCurrentCashBalance();
+        if ($totalAmount > $currentCashBalance) {
+            $formattedLimit = 'Rp ' . number_format($currentCashBalance, 0, ',', '.');
+            $formattedTotal = 'Rp ' . number_format($totalAmount, 0, ',', '.');
+            $errMsg = "Saldo kas saat ini tidak mencukupi untuk melakukan pengeluaran sebesar {$formattedTotal}. Sisa saldo kas yang tersedia hanya {$formattedLimit}.";
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => $errMsg,
+                ], 422);
+            }
+
+            return back()->with('error', $errMsg)->withInput();
+        }
 
         $proofPath = $request->file('proof_file')->store('outcomes/proofs', 'public');
         
@@ -279,30 +320,33 @@ class CashOutcomeController extends Controller
     public function edit(Request $request, $id)
     {
         $outcome = CashOutcome::findOrFail($id);
+        $currentCashBalance = $this->getCurrentCashBalance() + (float) $outcome->total_amount;
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'status' => 'success',
                 'data'   => [
-                    'id'                 => $outcome->id,
-                    'transaction_number' => $outcome->transaction_number,
-                    'transaction_date'   => $outcome->transaction_date ? $outcome->transaction_date->format('Y-m-d') : null,
-                    'recipient_name'     => $outcome->recipient_name,
-                    'bank_name'          => $outcome->bank_name,
-                    'account_number'     => $outcome->account_number,
-                    'amount'             => number_format($outcome->amount, 0, ',', '.'),
-                    'has_admin_fee'      => $outcome->has_admin_fee ? 'ya' : 'tidak',
-                    'admin_fee'          => number_format($outcome->admin_fee, 0, ',', '.'),
-                    'proof_url'          => $outcome->proof_url,
-                    'receipt_url'        => $outcome->receipt_url,
-                    'notes'              => $outcome->notes,
-                    'update_url'         => route('cash-outcomes.update', $outcome->id),
+                    'id'                     => $outcome->id,
+                    'transaction_number'     => $outcome->transaction_number,
+                    'transaction_date'       => $outcome->transaction_date ? $outcome->transaction_date->format('Y-m-d') : null,
+                    'recipient_name'         => $outcome->recipient_name,
+                    'bank_name'              => $outcome->bank_name,
+                    'account_number'         => $outcome->account_number,
+                    'amount'                 => number_format($outcome->amount, 0, ',', '.'),
+                    'has_admin_fee'          => $outcome->has_admin_fee ? 'ya' : 'tidak',
+                    'admin_fee'              => number_format($outcome->admin_fee, 0, ',', '.'),
+                    'proof_url'              => $outcome->proof_url,
+                    'receipt_url'            => $outcome->receipt_url,
+                    'notes'                  => $outcome->notes,
+                    'update_url'             => route('cash-outcomes.update', $outcome->id),
+                    'current_cash_balance'   => $currentCashBalance,
+                    'formatted_max_balance'  => 'Rp ' . number_format($currentCashBalance, 0, ',', '.'),
                 ]
             ]);
         }
 
         $banksGrouped = XenditService::getSupportedBanks();
-        return view('pages.cash-outcomes.edit', compact('outcome', 'banksGrouped'));
+        return view('pages.cash-outcomes.edit', compact('outcome', 'banksGrouped', 'currentCashBalance'));
     }
 
     public function update(Request $request, $id)
@@ -334,6 +378,14 @@ class CashOutcomeController extends Controller
         ]);
 
         $rawAmount = (float) str_replace(['.', ','], ['', '.'], str_replace(['Rp', ' ', '.'], '', $request->amount));
+        if ($rawAmount <= 0) {
+            $msg = 'Nominal pengeluaran harus lebih besar dari Rp 0.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['status' => 'error', 'message' => $msg], 422);
+            }
+            return back()->with('error', $msg)->withInput();
+        }
+
         $hasAdmin  = in_array($request->has_admin_fee, ['ya', '1', 1, true], true);
         $isAsset   = in_array($request->is_asset, ['ya', '1', 1, true], true);
         
@@ -343,6 +395,23 @@ class CashOutcomeController extends Controller
         }
 
         $totalAmount = $rawAmount + $rawAdminFee;
+
+        // Cek saldo kas saat ini dengan menambahkan kembali nilai transaksi lama
+        $currentAvailable = $this->getCurrentCashBalance() + (float) $outcome->total_amount;
+        if ($totalAmount > $currentAvailable) {
+            $formattedLimit = 'Rp ' . number_format($currentAvailable, 0, ',', '.');
+            $formattedTotal = 'Rp ' . number_format($totalAmount, 0, ',', '.');
+            $errMsg = "Saldo kas saat ini tidak mencukupi untuk memperbarui pengeluaran menjadi {$formattedTotal}. Sisa saldo kas yang tersedia maksimal {$formattedLimit}.";
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => $errMsg,
+                ], 422);
+            }
+
+            return back()->with('error', $errMsg)->withInput();
+        }
 
         $data = [
             'transaction_date' => $request->transaction_date,

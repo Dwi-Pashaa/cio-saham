@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CashIncome;
 use App\Models\CashOutcome;
 use App\Models\CashSaving;
+use App\Models\Setting;
 use App\Services\CashNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +19,27 @@ class CashSavingController extends Controller
      */
     public function store(Request $request)
     {
+        $user = auth()->user();
+        $isAdmin = $user ? $user->hasRole('Admin') : false;
+        $defaultAccount = Setting::getDefaultSavingsAccount();
+
+        // Jika bukan admin dan rekening default sudah tersimpan, pakai data tersimpan
+        if (!$isAdmin && !empty($defaultAccount['is_configured'])) {
+            $recipientName = $defaultAccount['recipient_name'];
+            $bankName      = $defaultAccount['bank_name'];
+            $accountNumber = $defaultAccount['account_number'];
+        } else {
+            $recipientName = $request->input('recipient_name') ?: ($defaultAccount['recipient_name'] ?? null);
+            $bankName      = $request->input('bank_name') ?: ($defaultAccount['bank_name'] ?? null);
+            $accountNumber = $request->input('account_number') ?: ($defaultAccount['account_number'] ?? null);
+        }
+
+        $request->merge([
+            'recipient_name' => $recipientName,
+            'bank_name'      => $bankName,
+            'account_number' => $accountNumber,
+        ]);
+
         $request->validate([
             'transaction_date' => 'required|date',
             'amount'           => 'required',
@@ -83,6 +105,25 @@ class CashSavingController extends Controller
             'proof_file'         => $proofPath,
             'created_by'         => auth()->id(),
         ]);
+
+        // Jika Admin, perbarui data rekening tabungan default di pengaturan sistem
+        if ($isAdmin) {
+            $setting = Setting::first();
+            if ($setting) {
+                $setting->update([
+                    'savings_recipient_name' => $saving->recipient_name,
+                    'savings_bank_name'      => $saving->bank_name,
+                    'savings_account_number' => $saving->account_number,
+                ]);
+            } else {
+                Setting::create([
+                    'telp'                   => '628123456789',
+                    'savings_recipient_name' => $saving->recipient_name,
+                    'savings_bank_name'      => $saving->bank_name,
+                    'savings_account_number' => $saving->account_number,
+                ]);
+            }
+        }
 
         // Notifikasi WA bila aktif
         try {

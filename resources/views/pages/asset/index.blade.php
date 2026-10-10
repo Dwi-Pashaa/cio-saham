@@ -1116,16 +1116,170 @@ $(document).ready(function () {
                 });
             }
         });
-        // Download Excel with active filters
-        $('#btn-export-asset-excel').on('click', function () {
-            const type = $('#filter_type').val();
-            const ownerType = $('#filter_owner_type').val();
-            const baseUrl = "{{ route('assets.export') }}";
-            const params = new URLSearchParams();
-            if (type) params.set('type', type);
-            if (ownerType) params.set('owner_type', ownerType);
-            const query = params.toString();
-            $(this).attr('href', query ? `${baseUrl}?${query}` : baseUrl);
+    });
+
+    // 11. Download Excel with active filters
+    $('#btn-export-asset-excel').on('click', function () {
+        const type = $('#filter_type').val();
+        const ownerType = $('#filter_owner_type').val();
+        const shareholderId = $('#filter_shareholder_id').val();
+        const baseUrl = "{{ route('assets.export') }}";
+        const params = new URLSearchParams();
+        if (type) params.set('type', type);
+        if (ownerType) params.set('owner_type', ownerType);
+        if (shareholderId) params.set('shareholder_id', shareholderId);
+        const query = params.toString();
+        $(this).attr('href', query ? `${baseUrl}?${query}` : baseUrl);
+    });
+
+    // 12. Submit Tambah Aset via AJAX (Pencegahan Double Click / Resubmission Duplikat)
+    var isSubmittingAdd = false;
+    $('#formAddAsset').on('submit', function (e) {
+        e.preventDefault();
+
+        if (isSubmittingAdd) return false;
+        isSubmittingAdd = true;
+
+        var form = this;
+        var btn = $('#btnSubmitAddAsset');
+        var originalBtnHtml = btn.html();
+
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1.5" role="status" aria-hidden="true"></span><span class="fw-semibold">Menyimpan...</span>');
+
+        var formData = new FormData(form);
+
+        $.ajax({
+            url: $(form).attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function (res) {
+                isSubmittingAdd = false;
+                btn.prop('disabled', false).html(originalBtnHtml);
+
+                $('#modalAddAsset').modal('hide');
+                form.reset();
+                $('#add_images_preview').empty();
+                $('.shareholder-select-wrap').addClass('d-none');
+                $('.select-shareholder').prop('required', false);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: res.message || 'Data aset berhasil ditambahkan ke inventaris.',
+                    confirmButtonColor: '#0ea5e9'
+                });
+
+                table.ajax.reload(null, false);
+            },
+            error: function (xhr) {
+                isSubmittingAdd = false;
+                btn.prop('disabled', false).html(originalBtnHtml);
+
+                var errorMsg = 'Terjadi kesalahan saat menyimpan data.';
+                if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                    var errors = xhr.responseJSON.errors;
+                    var messages = [];
+                    for (var key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            messages.push(errors[key].join('<br>'));
+                        }
+                    }
+                    errorMsg = messages.join('<br>');
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Menyimpan',
+                    html: errorMsg,
+                    confirmButtonColor: '#dc2626'
+                });
+            }
+        });
+    });
+
+    // Reset Form Tambah Aset saat modal ditutup
+    $('#modalAddAsset').on('hidden.bs.modal', function () {
+        if (!isSubmittingAdd) {
+            $('#formAddAsset')[0].reset();
+            $('#add_images_preview').empty();
+            $('.shareholder-select-wrap').addClass('d-none');
+            $('.select-shareholder').prop('required', false);
+        }
+    });
+
+    // 13. Submit Ubah Aset via AJAX (Pencegahan Double Click / Resubmission Duplikat)
+    var isSubmittingEdit = false;
+    $('#formEditAsset').on('submit', function (e) {
+        e.preventDefault();
+
+        if (isSubmittingEdit) return false;
+        isSubmittingEdit = true;
+
+        var form = this;
+        var btn = $('#btnSubmitEditAsset');
+        var originalBtnHtml = btn.html();
+
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1.5" role="status" aria-hidden="true"></span><span class="fw-semibold text-dark">Memperbarui...</span>');
+
+        var formData = new FormData(form);
+
+        $.ajax({
+            url: $(form).attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            success: function (res) {
+                isSubmittingEdit = false;
+                btn.prop('disabled', false).html(originalBtnHtml);
+
+                $('#modalEditAsset').modal('hide');
+                $('#edit_images_preview').empty();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Diperbarui!',
+                    text: res.message || 'Data aset berhasil diperbarui.',
+                    confirmButtonColor: '#0ea5e9'
+                });
+
+                table.ajax.reload(null, false);
+            },
+            error: function (xhr) {
+                isSubmittingEdit = false;
+                btn.prop('disabled', false).html(originalBtnHtml);
+
+                var errorMsg = 'Terjadi kesalahan saat memperbarui data.';
+                if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+                    var errors = xhr.responseJSON.errors;
+                    var messages = [];
+                    for (var key in errors) {
+                        if (errors.hasOwnProperty(key)) {
+                            messages.push(errors[key].join('<br>'));
+                        }
+                    }
+                    errorMsg = messages.join('<br>');
+                } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Memperbarui',
+                    html: errorMsg,
+                    confirmButtonColor: '#dc2626'
+                });
+            }
         });
     });
 });

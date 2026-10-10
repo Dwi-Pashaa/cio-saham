@@ -190,6 +190,40 @@
                 </div>
             </div>
 
+            <!-- 3. REKENING TUJUAN TABUNGAN (ALOKASI KAS KE TABUNGAN) -->
+            <div class="card-header py-3.5 px-4 bg-white border-top border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div class="avatar rounded-3 bg-azure-lt text-azure" style="width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12" /><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4" /></svg>
+                    </div>
+                    <div>
+                        <h4 class="card-title fw-bold text-dark mb-0">Rekening Tujuan Tabungan Default</h4>
+                        <div class="text-muted small">Rekening bank tujuan yang otomatis dipakai saat pengguna mengalokasikan kas ke pos tabungan terpisah di Dashboard.</div>
+                    </div>
+                </div>
+                <span class="badge bg-azure-lt text-azure font-monospace">Otomatis Terisi di Dashboard</span>
+            </div>
+
+            <div class="card-body p-4 bg-white">
+                <div class="row g-3">
+                    <div class="col-md-4 col-12">
+                        <label class="form-label fw-bold text-dark">Nama Pemilik / Penerima Tabungan</label>
+                        <input type="text" name="savings_recipient_name" class="form-control" placeholder="Contoh: Rekening Tabungan PT CIO / Yoga" value="{{ old('savings_recipient_name', $settings->savings_recipient_name ?? '') }}">
+                        <div class="form-text text-muted small">Atas nama pemilik rekening tabungan yang menerima alokasi.</div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <label class="form-label fw-bold text-dark">Nama Bank Tujuan</label>
+                        <input type="text" name="savings_bank_name" class="form-control" placeholder="Contoh: BCA / Mandiri / BRI" value="{{ old('savings_bank_name', $settings->savings_bank_name ?? '') }}">
+                        <div class="form-text text-muted small">Nama bank rekening tabungan.</div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <label class="form-label fw-bold text-dark">Nomor Rekening</label>
+                        <input type="text" name="savings_account_number" class="form-control font-monospace" placeholder="Contoh: 7128912345" value="{{ old('savings_account_number', $settings->savings_account_number ?? '') }}">
+                        <div class="form-text text-muted small">Nomor rekening tabungan tujuan.</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card-footer bg-white py-3 px-4 d-flex justify-content-end border-top">
                 <button type="submit" class="btn btn-primary px-4 py-2 d-inline-flex align-items-center gap-2 rounded-3 fw-bold shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" /><path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /><path d="M14 4l0 4l-6 0l0 -4" /></svg>

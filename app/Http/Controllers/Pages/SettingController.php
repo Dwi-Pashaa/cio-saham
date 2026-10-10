@@ -26,11 +26,14 @@ class SettingController extends Controller
     public function store(Request $request) 
     {
         $request->validate([
-            "telp"                 => "nullable|string",
-            "notification_channel" => "nullable|in:whatsapp,email,both,none",
-            "fonnte_token"         => "nullable|string",
-            "target_wa_kas"        => "nullable|string",
-            "admin_fee"            => "nullable",
+            "telp"                   => "nullable|string",
+            "notification_channel"   => "nullable|in:whatsapp,email,both,none",
+            "fonnte_token"           => "nullable|string",
+            "target_wa_kas"          => "nullable|string",
+            "admin_fee"              => "nullable",
+            "savings_recipient_name" => "nullable|string|max:255",
+            "savings_bank_name"      => "nullable|string|max:100",
+            "savings_account_number" => "nullable|string|max:50",
         ]);
 
         $setting = Setting::find($request->id ?? 1);
@@ -39,15 +42,21 @@ class SettingController extends Controller
         $fonnteToken = $request->has('fonnte_token') ? $request->fonnte_token : ($setting->fonnte_token ?? null);
         $targetWaKas = $request->has('target_wa_kas') ? $request->target_wa_kas : ($setting->target_wa_kas ?? null);
         $adminFee = $request->has('admin_fee') ? (float) str_replace('.', '', $request->admin_fee ?? 0) : ($setting->admin_fee ?? 0);
+        $savingsRecipient = $request->has('savings_recipient_name') ? $request->savings_recipient_name : ($setting->savings_recipient_name ?? null);
+        $savingsBank      = $request->has('savings_bank_name') ? $request->savings_bank_name : ($setting->savings_bank_name ?? null);
+        $savingsAccount   = $request->has('savings_account_number') ? $request->savings_account_number : ($setting->savings_account_number ?? null);
 
         Setting::updateOrCreate(
             ['id' => $request->id ?? 1],
             [
-                "telp"                 => $telp,
-                "notification_channel" => $notificationChannel,
-                "fonnte_token"         => $fonnteToken,
-                "target_wa_kas"        => $targetWaKas,
-                "admin_fee"            => $adminFee,
+                "telp"                   => $telp,
+                "notification_channel"   => $notificationChannel,
+                "fonnte_token"           => $fonnteToken,
+                "target_wa_kas"          => $targetWaKas,
+                "admin_fee"              => $adminFee,
+                "savings_recipient_name" => $savingsRecipient,
+                "savings_bank_name"      => $savingsBank,
+                "savings_account_number" => $savingsAccount,
             ]
         );
 
