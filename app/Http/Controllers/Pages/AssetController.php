@@ -233,32 +233,37 @@ class AssetController extends Controller
      */
     private function parsePrice($price): float
     {
-        if (is_numeric($price)) {
+        if (is_int($price) || is_float($price)) {
             return (float) $price;
         }
 
         $cleaned = trim((string) $price);
         $cleaned = preg_replace('/[^\d.,]/', '', $cleaned);
 
-        if (empty($cleaned)) {
+        if ($cleaned === '') {
             return 0.0;
         }
 
         if (str_contains($cleaned, '.') && str_contains($cleaned, ',')) {
             if (strrpos($cleaned, ',') > strrpos($cleaned, '.')) {
+                // Format Indonesia: 1.500.000,50 -> buang titik ribuan, ganti koma desimal jadi titik
                 $cleaned = str_replace('.', '', $cleaned);
                 $cleaned = str_replace(',', '.', $cleaned);
             } else {
+                // Format Internasional: 1,500,000.50 -> buang koma ribuan
                 $cleaned = str_replace(',', '', $cleaned);
             }
         } elseif (str_contains($cleaned, '.')) {
+            // Jika ada titik pemisah ribuan (lebih dari 1 titik atau diikuti 3 digit seperti 650.000 / 50.000)
             if (substr_count($cleaned, '.') > 1 || preg_match('/\.\d{3}$/', $cleaned)) {
                 $cleaned = str_replace('.', '', $cleaned);
             }
         } elseif (str_contains($cleaned, ',')) {
+            // Jika ada koma sebagai pemisah ribuan (1,000,000 atau 650,000)
             if (substr_count($cleaned, ',') > 1 || preg_match('/,\d{3}$/', $cleaned)) {
                 $cleaned = str_replace(',', '', $cleaned);
             } else {
+                // Koma desimal tunggal: 650,50 -> 650.50
                 $cleaned = str_replace(',', '.', $cleaned);
             }
         }

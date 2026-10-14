@@ -208,7 +208,7 @@
 @push('js')
 <script>
 $(document).ready(function () {
-    $(document).on('keyup', '.rupiah-input', function () {
+    $(document).on('input paste keyup', '.rupiah-input', function () {
         var value = $(this).val().replace(/[^0-9]/g, '');
         if (value) {
             $(this).val(new Intl.NumberFormat('id-ID').format(value));

@@ -625,7 +625,7 @@
 <script>
 $(document).ready(function () {
     // 1. Format Rupiah Input Mask
-    $(document).on('keyup', '.rupiah-input', function () {
+    $(document).on('input paste keyup', '.rupiah-input', function () {
         var value = $(this).val().replace(/[^0-9]/g, '');
         if (value) {
             $(this).val(new Intl.NumberFormat('id-ID').format(value));
@@ -1147,6 +1147,12 @@ $(document).ready(function () {
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1.5" role="status" aria-hidden="true"></span><span class="fw-semibold">Menyimpan...</span>');
 
         var formData = new FormData(form);
+        if ($('#add_price').length) {
+            var rawPrice = $('#add_price').val().replace(/[^0-9]/g, '');
+            if (rawPrice) {
+                formData.set('price', rawPrice);
+            }
+        }
 
         $.ajax({
             url: $(form).attr('action'),
@@ -1229,6 +1235,12 @@ $(document).ready(function () {
         btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1.5" role="status" aria-hidden="true"></span><span class="fw-semibold text-dark">Memperbarui...</span>');
 
         var formData = new FormData(form);
+        if ($('#edit_price').length) {
+            var rawPrice = $('#edit_price').val().replace(/[^0-9]/g, '');
+            if (rawPrice) {
+                formData.set('price', rawPrice);
+            }
+        }
 
         $.ajax({
             url: $(form).attr('action'),
