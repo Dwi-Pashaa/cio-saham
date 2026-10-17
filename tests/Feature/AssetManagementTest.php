@@ -317,4 +317,41 @@ class AssetManagementTest extends TestCase
 
         Storage::disk('public')->assertMissing($path);
     }
+
+    /**
+     * 10. Pengujian upload file foto dan dokumen PDF sekaligus untuk aset.
+     */
+    public function test_user_can_upload_pdf_documents_and_images_for_asset(): void
+    {
+        Storage::fake('public');
+
+        $imageFile = UploadedFile::fake()->create('foto_perangkat.jpg', 200, 'image/jpeg');
+        $pdfFile = UploadedFile::fake()->create('faktur_pembelian.pdf', 500, 'application/pdf');
+
+        $response = $this->actingAs($this->adminUser)->postJson('/assets/store', [
+            'name'   => 'Router Core Juniper MX204',
+            'type'   => 'Perangkat Jaringan',
+            'price'  => '125.000.000',
+            'images' => [$imageFile, $pdfFile],
+        ]);
+
+        $response->assertStatus(200);
+
+        $asset = Asset::where('name', 'Router Core Juniper MX204')->first();
+        $this->assertNotNull($asset);
+        $this->assertCount(2, $asset->images);
+
+        $pdfImage = $asset->images->first(fn($img) => $img->is_pdf);
+        $this->assertNotNull($pdfImage, 'Berkas PDF harus teridentifikasi sebagai is_pdf = true');
+        $this->assertTrue(str_ends_with($pdfImage->image_path, '.pdf'));
+        Storage::disk('public')->assertExists($pdfImage->image_path);
+
+        // Pengujian response show JSON menyertakan is_pdf
+        $showResponse = $this->actingAs($this->adminUser)->getJson('/assets/' . $asset->id);
+        $showResponse->assertStatus(200);
+        $showResponse->assertJsonFragment([
+            'is_pdf' => true,
+        ]);
+    }
 }
+

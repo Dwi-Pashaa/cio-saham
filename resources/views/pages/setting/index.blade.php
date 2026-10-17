@@ -106,8 +106,8 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /></svg>
                     </div>
                     <div>
-                        <h4 class="card-title fw-bold text-dark mb-0">Saluran Notifikasi Bukti Transfer Dividen</h4>
-                        <div class="text-muted small">Atur kanal pengiriman notifikasi pembagian keuntungan dividen kepada investor via Mekari Qontak.</div>
+                        <h4 class="card-title fw-bold text-dark mb-0">Saluran Notifikasi Sistem (WhatsApp & Email)</h4>
+                        <div class="text-muted small">Atur kanal pengiriman notifikasi seluruh sistem: Mutasi Kas (Masuk/Keluar/Tabungan), Penambahan Aset, Pembagian Dividen, Laporan Finansial Harian, dan OTP Verifikasi.</div>
                     </div>
                 </div>
             </div>
@@ -116,7 +116,7 @@
                 <div class="row g-4">
                     <div class="col-12">
                         <label class="form-label fw-bold text-dark mb-2">
-                            Pilih Saluran Notifikasi Bukti Transfer (Mekari Qontak) <span class="text-danger">*</span>
+                            Pilih Saluran Notifikasi Sistem <span class="text-danger">*</span>
                         </label>
                         @php
                             $currentChannel = old('notification_channel', $settings->notification_channel ?? 'whatsapp');
@@ -132,7 +132,7 @@
                                         </div>
                                         <div>
                                             <strong class="d-block text-dark">WhatsApp</strong>
-                                            <span class="text-muted" style="font-size: 0.75rem;">Kirim template WA</span>
+                                            <span class="text-muted" style="font-size: 0.75rem;">Hanya via WhatsApp</span>
                                         </div>
                                     </div>
                                 </label>
@@ -148,7 +148,7 @@
                                         </div>
                                         <div>
                                             <strong class="d-block text-dark">Email</strong>
-                                            <span class="text-muted" style="font-size: 0.75rem;">Kirim bukti PDF</span>
+                                            <span class="text-muted" style="font-size: 0.75rem;">Hanya via Email</span>
                                         </div>
                                     </div>
                                 </label>
@@ -164,7 +164,7 @@
                                         </div>
                                         <div>
                                             <strong class="d-block text-dark">Keduanya</strong>
-                                            <span class="text-muted" style="font-size: 0.75rem;">WA & Email</span>
+                                            <span class="text-muted" style="font-size: 0.75rem;">WA & Email Bersamaan</span>
                                         </div>
                                     </div>
                                 </label>
@@ -180,7 +180,7 @@
                                         </div>
                                         <div>
                                             <strong class="d-block text-dark">Nonaktif</strong>
-                                            <span class="text-muted" style="font-size: 0.75rem;">Tanpa notifikasi</span>
+                                            <span class="text-muted" style="font-size: 0.75rem;">Matikan Notifikasi</span>
                                         </div>
                                     </div>
                                 </label>

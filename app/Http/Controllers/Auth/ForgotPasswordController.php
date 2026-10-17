@@ -99,8 +99,7 @@ class ForgotPasswordController extends Controller
 
         $sentChannels = [];
 
-        // Prioritas Pengiriman Default:
-        // 1. Kirim ke Email sebagai default jika akun memiliki email dan pengaturan mengizinkan (email / both)
+        // 1. Kirim ke Email jika akun memiliki email dan pengaturan mengizinkan (email / both)
         if (in_array($channel, ['email', 'both']) && $hasEmail) {
             try {
                 Mail::to($user->email)->send(new ResetPasswordOtpMail($user, $otpCode, $expiryMinutes));
@@ -109,11 +108,31 @@ class ForgotPasswordController extends Controller
                 Log::error('Gagal mengirim OTP Email: ' . $e->getMessage());
             }
         } 
-        // 2. Jika pengaturan hanya WhatsApp atau user tidak memiliki email, kirim langsung ke WhatsApp
-        elseif (in_array($channel, ['whatsapp', 'both']) && $hasPhone) {
+
+        // 2. Kirim ke WhatsApp jika user memiliki nomor HP dan pengaturan mengizinkan (whatsapp / both)
+        if (in_array($channel, ['whatsapp', 'both']) && $hasPhone) {
             try {
-                $this->qontakService->sendOtpNotification($user, $otpCode);
-                $sentChannels[] = 'WhatsApp (' . $this->maskPhone($user->phone) . ')';
+                $qontakResult = $this->qontakService->sendOtpNotification($user, $otpCode);
+                if (!($qontakResult['success'] ?? false) || ($qontakResult['simulated'] ?? false)) {
+                    // Fallback ke Fonnte jika Qontak simulasi, gagal, atau belum dikonfigurasi
+                    $fonnteService = app(\App\Services\FonnteService::class);
+                    $appName = config('app.name', 'CIO Investor');
+                    $msg = "*{$appName} - Verifikasi Reset Password*\n\n"
+                        . "Halo *{$user->name}*,\n\n"
+                        . "Kode OTP untuk mengatur ulang kata sandi akun Anda adalah:\n\n"
+                        . "*{$otpCode}*\n\n"
+                        . "Kode ini bersifat rahasia dan berlaku selama {$expiryMinutes} menit. Jangan berikan kode ini kepada siapapun.";
+                    $fonnteRes = $fonnteService->sendMessage($user->phone, $msg);
+                    if ($fonnteRes['status'] ?? $fonnteRes['success'] ?? false) {
+                        $sentChannels[] = 'WhatsApp (' . $this->maskPhone($user->phone) . ')';
+                    } elseif ($qontakResult['simulated'] ?? false) {
+                        $sentChannels[] = 'WhatsApp (' . $this->maskPhone($user->phone) . ')';
+                    } else {
+                        Log::warning('Gagal mengirim OTP via Qontak & Fonnte: ' . ($fonnteRes['message'] ?? 'Unknown error'));
+                    }
+                } else {
+                    $sentChannels[] = 'WhatsApp (' . $this->maskPhone($user->phone) . ')';
+                }
             } catch (\Throwable $e) {
                 Log::error('Gagal mengirim OTP WhatsApp: ' . $e->getMessage());
             }
@@ -225,7 +244,19 @@ class ForgotPasswordController extends Controller
                     'reset_otp_created_at'   => Carbon::now()->timestamp,
                 ]);
 
-                if ($waResult['success'] ?? false) {
+                if (!($waResult['success'] ?? false)) {
+                    $fonnteService = app(\App\Services\FonnteService::class);
+                    $appName = config('app.name', 'CIO Investor');
+                    $msg = "*{$appName} - Verifikasi Reset Password*\n\n"
+                        . "Halo *{$user->name}*,\n\n"
+                        . "Kode OTP untuk mengatur ulang kata sandi akun Anda adalah:\n\n"
+                        . "*{$otpCode}*\n\n"
+                        . "Kode ini berlaku selama {$expiryMinutes} menit.";
+                    $fonnteRes = $fonnteService->sendMessage($user->phone, $msg);
+                    if ($fonnteRes['success'] ?? false) {
+                        return back()->with('success', "Kode OTP berhasil dikirimkan ke WhatsApp Anda ({$maskedPhone}).");
+                    }
+                } else {
                     return back()->with('success', "Kode OTP berhasil dikirimkan ke WhatsApp Anda ({$maskedPhone}).");
                 }
 
@@ -352,8 +383,22 @@ class ForgotPasswordController extends Controller
 
         if (in_array($channel, ['whatsapp', 'both']) && !empty($user->phone)) {
             try {
-                $this->qontakService->sendOtpNotification($user, $otpCode);
-                $sentChannels[] = 'WhatsApp (' . $this->maskPhone($user->phone) . ')';
+                $qontakResult = $this->qontakService->sendOtpNotification($user, $otpCode);
+                if (!($qontakResult['success'] ?? false)) {
+                    $fonnteService = app(\App\Services\FonnteService::class);
+                    $appName = config('app.name', 'CIO Investor');
+                    $msg = "*{$appName} - Verifikasi Reset Password*\n\n"
+                        . "Halo *{$user->name}*,\n\n"
+                        . "Kode OTP baru untuk mengatur ulang kata sandi akun Anda adalah:\n\n"
+                        . "*{$otpCode}*\n\n"
+                        . "Kode ini berlaku selama {$expiryMinutes} menit.";
+                    $fonnteRes = $fonnteService->sendMessage($user->phone, $msg);
+                    if ($fonnteRes['success'] ?? false) {
+                        $sentChannels[] = 'WhatsApp (' . $this->maskPhone($user->phone) . ')';
+                    }
+                } else {
+                    $sentChannels[] = 'WhatsApp (' . $this->maskPhone($user->phone) . ')';
+                }
             } catch (\Throwable $e) {
                 Log::error('Gagal kirim ulang OTP WhatsApp: ' . $e->getMessage());
             }

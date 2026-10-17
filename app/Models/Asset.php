@@ -54,7 +54,7 @@ class Asset extends Model
      */
     public function getThumbnailUrlAttribute(): ?string
     {
-        $firstImage = $this->images->first();
+        $firstImage = $this->images->first(fn($img) => !$img->is_pdf) ?? $this->images->first();
         return $firstImage ? $firstImage->url : null;
     }
 

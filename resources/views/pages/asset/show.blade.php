@@ -40,23 +40,36 @@
         </div>
     </div>
 
-    <!-- Galeri Foto Aset (Jika ada) -->
+    <!-- Galeri Foto & Dokumen Aset (Jika ada) -->
     @if($asset->images->count() > 0)
         <div class="card p-4 border-0 shadow-sm bg-white mb-4 rounded-3">
             <div class="d-flex align-items-center gap-2 mb-3">
                 <span class="badge bg-purple-lt p-2 rounded-circle">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 8h.01" /><path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z" /><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5" /><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3" /></svg>
                 </span>
-                <h4 class="fw-bold text-dark mb-0 fs-3">Galeri Foto Aset ({{ $asset->images->count() }} Foto)</h4>
+                <h4 class="fw-bold text-dark mb-0 fs-3">Galeri Foto & Dokumen Aset ({{ $asset->images->count() }} Berkas)</h4>
             </div>
             <div class="d-flex flex-wrap gap-3">
                 @foreach($asset->images as $idx => $img)
-                    <div class="position-relative border rounded-2 p-1.5 bg-white cursor-pointer shadow-2xs btn-zoom-photo" data-img="{{ $img->url }}" data-name="{{ $asset->name }} (Foto {{ $idx + 1 }})" style="width: 120px; height: 120px;" title="Klik untuk memperbesar">
-                        <img src="{{ $img->url }}" class="rounded-1 w-100 h-100" style="object-fit: cover;">
-                        @if($img->is_primary)
-                            <span class="badge bg-primary position-absolute bottom-0 start-0 m-2 font-monospace" style="font-size: 0.62rem;">Sampul</span>
-                        @endif
-                    </div>
+                    @if($img->is_pdf)
+                        <a href="{{ $img->url }}" target="_blank" class="position-relative border rounded-2 p-2 bg-light-subtle shadow-2xs d-flex flex-column align-items-center justify-content-center text-center text-decoration-none" style="width: 120px; height: 120px;" title="Buka Dokumen PDF ({{ $img->file_name }})">
+                            <span class="badge bg-danger-lt px-2 py-0.5 mb-1.5 font-monospace fw-bold" style="font-size: 0.7rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-0.5"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M10 12h2a2 2 0 1 0 0 -4h-2v8m4 0h3" /></svg>PDF
+                            </span>
+                            <div class="text-truncate w-100 fw-bold text-dark" style="font-size: 0.72rem; line-height: 1.2;">{{ $img->file_name }}</div>
+                            <span class="text-primary mt-1 small">Buka PDF ↗</span>
+                            @if($img->is_primary)
+                                <span class="badge bg-primary position-absolute bottom-0 start-0 m-2 font-monospace" style="font-size: 0.62rem;">Sampul</span>
+                            @endif
+                        </a>
+                    @else
+                        <div class="position-relative border rounded-2 p-1.5 bg-white cursor-pointer shadow-2xs btn-zoom-photo" data-img="{{ $img->url }}" data-name="{{ $asset->name }} (Foto {{ $idx + 1 }})" style="width: 120px; height: 120px;" title="Klik untuk memperbesar">
+                            <img src="{{ $img->url }}" class="rounded-1 w-100 h-100" style="object-fit: cover;">
+                            @if($img->is_primary)
+                                <span class="badge bg-primary position-absolute bottom-0 start-0 m-2 font-monospace" style="font-size: 0.62rem;">Sampul</span>
+                            @endif
+                        </div>
+                    @endif
                 @endforeach
             </div>
         </div>

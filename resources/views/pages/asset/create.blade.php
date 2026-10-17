@@ -107,17 +107,17 @@
                         @enderror
                     </div>
 
-                    <!-- UPLOAD MULTIPLE FOTO ASET -->
+                    <!-- UPLOAD MULTIPLE FOTO & DOKUMEN ASET -->
                     <div class="col-12">
                         <label class="form-label fw-bold text-dark mb-1 d-flex justify-content-between align-items-center">
                             <span class="d-flex align-items-center gap-1.5">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon text-primary"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 8h.01" /><path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z" /><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5" /><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3" /></svg>
-                                <span>Foto / Dokumentasi Fisik Aset</span>
+                                <span>Foto / Dokumentasi Fisik & Berkas Aset</span>
                             </span>
-                            <span class="badge bg-light text-muted small">Bisa pilih lebih dari 1 foto (Maks. 5MB)</span>
+                            <span class="badge bg-light text-muted small">Bisa foto & dokumen PDF (Maks. 10MB)</span>
                         </label>
-                        <input type="file" name="images[]" id="standalone_asset_images" class="form-control" accept="image/jpeg,image/png,image/webp,image/jpg" multiple>
-                        <div class="form-text text-muted small mt-1">Pilih satu atau beberapa file foto (JPG, PNG, WEBP). Foto pertama akan menjadi foto sampul.</div>
+                        <input type="file" name="images[]" id="standalone_asset_images" class="form-control" accept="image/jpeg,image/png,image/webp,image/jpg,application/pdf" multiple>
+                        <div class="form-text text-muted small mt-1">Pilih berkas foto (JPG, PNG, WEBP) atau dokumen PDF (Faktur, Kwitansi, Manual, dll). Berkas pertama akan menjadi berkas sampul.</div>
                         <div id="standalone_images_preview" class="d-flex flex-wrap gap-2 mt-2"></div>
                     </div>
 
@@ -217,23 +217,53 @@ $(document).ready(function () {
         }
     });
 
+    function formatBytes(bytes) {
+        if (!bytes || bytes === 0) return '0 B';
+        var k = 1024;
+        var sizes = ['B', 'KB', 'MB', 'GB'];
+        var i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    function isPdfFile(filename, mimeType) {
+        if (mimeType && mimeType.toLowerCase().includes('pdf')) return true;
+        if (filename && filename.toLowerCase().endsWith('.pdf')) return true;
+        return false;
+    }
+
     $('#standalone_asset_images').on('change', function () {
         var previewWrap = $('#standalone_images_preview');
         previewWrap.empty();
         if (this.files && this.files.length > 0) {
             Array.from(this.files).forEach(function (file, index) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    var primaryBadge = index === 0 ? '<span class="badge bg-primary position-absolute bottom-0 start-0 m-1 font-monospace" style="font-size: 0.6rem;">Utama</span>' : '';
+                var isPrimary = index === 0;
+                var primaryBadge = isPrimary ? '<span class="badge bg-primary position-absolute bottom-0 start-0 m-1 font-monospace" style="font-size: 0.6rem; z-index: 2;">Utama</span>' : '';
+
+                if (isPdfFile(file.name, file.type)) {
                     var card = $(`
-                        <div class="position-relative border rounded-2 p-1 bg-white shadow-2xs" style="width: 82px; height: 82px;">
-                            <img src="${e.target.result}" class="rounded-1 w-100 h-100" style="object-fit: cover;">
+                        <div class="position-relative border rounded-2 p-1.5 bg-white shadow-2xs d-flex flex-column align-items-center justify-content-center text-center" style="width: 86px; height: 86px;" title="${file.name} (${formatBytes(file.size)})">
+                            <span class="badge bg-danger-lt px-1.5 py-0.5 mb-1 fw-bold font-monospace" style="font-size: 0.65rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-0.5"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M10 12h2a2 2 0 1 0 0 -4h-2v8m4 0h3" /></svg>PDF
+                            </span>
+                            <div class="text-truncate w-100 fw-semibold text-dark" style="font-size: 0.65rem; line-height: 1.1;">${file.name}</div>
+                            <div class="text-muted font-monospace mt-0.5" style="font-size: 0.58rem;">${formatBytes(file.size)}</div>
                             ${primaryBadge}
                         </div>
                     `);
                     previewWrap.append(card);
-                };
-                reader.readAsDataURL(file);
+                } else {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var card = $(`
+                            <div class="position-relative border rounded-2 p-1 bg-white shadow-2xs" style="width: 86px; height: 86px;" title="${file.name}">
+                                <img src="${e.target.result}" class="rounded-1 w-100 h-100" style="object-fit: cover;">
+                                ${primaryBadge}
+                            </div>
+                        `);
+                        previewWrap.append(card);
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
     });

@@ -157,7 +157,7 @@ class AssetController extends Controller
 
                     $btnGallery = '';
                     if ($item->images->count() > 0) {
-                        $btnGallery = '<button type="button" class="btn-action btn-action-purple btn-view-gallery" data-id="' . $item->id . '" title="Lihat Galeri Foto (' . $item->images->count() . ' Foto)">
+                        $btnGallery = '<button type="button" class="btn-action btn-action-purple btn-view-gallery" data-id="' . $item->id . '" title="Lihat Foto & Dokumen (' . $item->images->count() . ' Berkas)">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 8h.01" /><path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z" /><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5" /><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3" /></svg>
                                     </button>';
                     }
@@ -287,11 +287,11 @@ class AssetController extends Controller
             'purchase_date'  => 'nullable|date',
             'notes'          => 'nullable|string',
             'images'         => 'nullable|array',
-            'images.*'       => 'file|mimes:jpeg,png,jpg,webp|max:5120',
+            'images.*'       => 'file|mimes:jpeg,png,jpg,webp,pdf|max:10240',
         ], [
-            'images.*.uploaded' => 'Salah satu berkas foto aset gagal diunggah karena melebihi batas upload server. Silakan kompres foto atau gunakan file berukuran maksimal 5MB.',
-            'images.*.mimes'    => 'Format foto aset harus berupa JPG, JPEG, PNG, atau WEBP.',
-            'images.*.max'      => 'Ukuran masing-masing foto aset tidak boleh melebihi 5MB.',
+            'images.*.uploaded' => 'Salah satu berkas foto/dokumen aset gagal diunggah karena melebihi batas upload server. Silakan kompres berkas atau gunakan file berukuran maksimal 10MB.',
+            'images.*.mimes'    => 'Format foto/dokumen aset harus berupa JPG, JPEG, PNG, WEBP, atau PDF.',
+            'images.*.max'      => 'Ukuran masing-masing berkas foto/dokumen aset tidak boleh melebihi 10MB.',
         ]);
 
         $rawPrice = $this->parsePrice($request->price);
@@ -418,6 +418,8 @@ class AssetController extends Controller
                         'id'         => $img->id,
                         'url'        => $img->url,
                         'is_primary' => $img->is_primary,
+                        'is_pdf'     => $img->is_pdf,
+                        'file_name'  => $img->file_name,
                     ]),
                     'thumbnail_url'             => $asset->thumbnail_url,
                 ]
@@ -463,6 +465,8 @@ class AssetController extends Controller
                         'id'         => $img->id,
                         'url'        => $img->url,
                         'is_primary' => $img->is_primary,
+                        'is_pdf'     => $img->is_pdf,
+                        'file_name'  => $img->file_name,
                     ]),
                 ]
             ]);
@@ -500,11 +504,11 @@ class AssetController extends Controller
             'purchase_date'  => 'nullable|date',
             'notes'          => 'nullable|string',
             'images'         => 'nullable|array',
-            'images.*'       => 'file|mimes:jpeg,png,jpg,webp|max:5120',
+            'images.*'       => 'file|mimes:jpeg,png,jpg,webp,pdf|max:10240',
         ], [
-            'images.*.uploaded' => 'Salah satu berkas foto aset gagal diunggah karena melebihi batas upload server. Silakan kompres foto atau gunakan file berukuran maksimal 5MB.',
-            'images.*.mimes'    => 'Format foto aset harus berupa JPG, JPEG, PNG, atau WEBP.',
-            'images.*.max'      => 'Ukuran masing-masing foto aset tidak boleh melebihi 5MB.',
+            'images.*.uploaded' => 'Salah satu berkas foto/dokumen aset gagal diunggah karena melebihi batas upload server. Silakan kompres berkas atau gunakan file berukuran maksimal 10MB.',
+            'images.*.mimes'    => 'Format foto/dokumen aset harus berupa JPG, JPEG, PNG, WEBP, atau PDF.',
+            'images.*.max'      => 'Ukuran masing-masing berkas foto/dokumen aset tidak boleh melebihi 10MB.',
         ]);
 
         $rawPrice = $this->parsePrice($request->price);
@@ -589,7 +593,7 @@ class AssetController extends Controller
 
         return response()->json([
             'status'  => 'success',
-            'message' => 'Foto aset berhasil dihapus.'
+            'message' => 'Berkas foto/dokumen aset berhasil dihapus.'
         ]);
     }
 

@@ -147,6 +147,7 @@ class FonnteService
 
                 return [
                     'status'   => true,
+                    'success'  => true,
                     'message'  => 'Pesan WhatsApp berhasil dikirim via Fonnte.',
                     'response' => $resData,
                 ];
@@ -161,6 +162,7 @@ class FonnteService
 
             return [
                 'status'   => false,
+                'success'  => false,
                 'message'  => 'Gagal mengirim pesan via Fonnte: ' . $errMsg,
                 'response' => $resData,
             ];
@@ -172,6 +174,7 @@ class FonnteService
 
             return [
                 'status'  => false,
+                'success' => false,
                 'message' => 'Terjadi kesalahan sistem saat menghubungi server Fonnte: ' . $e->getMessage(),
             ];
         }

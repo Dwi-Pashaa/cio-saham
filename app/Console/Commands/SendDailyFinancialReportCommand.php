@@ -75,7 +75,21 @@ class SendDailyFinancialReportCommand extends Command
             ]
         );
 
-        // 2. Ambil daftar investor penerima
+        // 2. Cek Pengaturan Saluran Notifikasi Sistem
+        $setting = \App\Models\Setting::first();
+        $channel = strtolower($setting?->notification_channel ?? 'whatsapp');
+
+        $this->info("Saluran Notifikasi Terkonfigurasi: " . strtoupper($channel));
+
+        if ($channel === 'none') {
+            $this->warn("Pengiriman dibatalkan: Pengaturan saluran notifikasi disetel ke 'none' (Nonaktif).");
+            return Command::SUCCESS;
+        }
+
+        $shouldSendEmail = in_array($channel, ['email', 'both']);
+        $shouldSendWa    = in_array($channel, ['whatsapp', 'both']);
+
+        // 3. Ambil daftar investor penerima
         if ($testEmail) {
             $this->warn("Mode Uji Coba: Hanya mengirim ke {$testEmail}");
             $sampleShareholder = Shareholder::where('email', $testEmail)->first();
@@ -92,65 +106,124 @@ class SendDailyFinancialReportCommand extends Command
         } else {
             $shareholders = Shareholder::with('holdings')
                 ->where('status', 'active')
-                ->whereNotNull('email')
-                ->where('email', '!=', '')
+                ->where(function ($query) use ($shouldSendEmail, $shouldSendWa) {
+                    if ($shouldSendEmail && !$shouldSendWa) {
+                        $query->whereNotNull('email')->where('email', '!=', '');
+                    } elseif ($shouldSendWa && !$shouldSendEmail) {
+                        $query->whereNotNull('phone')->where('phone', '!=', '');
+                    } else {
+                        $query->where(function ($q) {
+                            $q->whereNotNull('email')->where('email', '!=', '');
+                        })->orWhere(function ($q) {
+                            $q->whereNotNull('phone')->where('phone', '!=', '');
+                        });
+                    }
+                })
                 ->get();
         }
 
         if ($shareholders->isEmpty()) {
-            $this->warn("Tidak ada pemegang saham aktif yang memiliki alamat email.");
+            $this->warn("Tidak ada pemegang saham aktif yang memenuhi kriteria penerima notifikasi.");
             return Command::SUCCESS;
         }
 
         $this->info("Ditemukan {$shareholders->count()} pemegang saham aktif penerima.");
 
-        $sentCount = 0;
-        $failedCount = 0;
+        $sentEmailCount = 0;
+        $failedEmailCount = 0;
+        $sentWaCount = 0;
+        $failedWaCount = 0;
+
+        $fonnteService = $shouldSendWa ? app(\App\Services\FonnteService::class) : null;
+        $appName = config('app.name', 'CIO Investor');
+        $formattedDate = Carbon::parse($targetDate)->translatedFormat('d F Y');
 
         foreach ($shareholders as $sh) {
             $percentage = (float) ($sh->total_percentage ?? 0);
             $personalProfit = $netProfit * ($percentage / 100);
 
-            $this->line("-> Investor: {$sh->name} ({$sh->email}) | Porsi: {$percentage}% | Estimasi Laba: Rp " . number_format($personalProfit, 0, ',', '.'));
+            $this->line("-> Investor: {$sh->name} | Email: " . ($sh->email ?: '-') . " | WA: " . ($sh->phone ?: '-') . " | Porsi: {$percentage}% | Estimasi Laba: Rp " . number_format($personalProfit, 0, ',', '.'));
 
             if ($isDryRun) {
-                $this->comment("   [DRY-RUN] Email dilewati.");
+                $this->comment("   [DRY-RUN] Notifikasi dilewati.");
                 continue;
             }
 
-            try {
-                Mail::to($sh->email)->send(new DailyFinancialReportMail($sh, $dailyData, $personalProfit));
-                $sentCount++;
-                $this->info("   [OK] Email berhasil dikirim ke {$sh->email}");
-            } catch (\Throwable $e) {
-                $failedCount++;
-                $this->error("   [GAGAL] Gagal mengirim ke {$sh->email}: " . $e->getMessage());
-                Log::error("Cron Daily Report: Gagal kirim email", [
-                    'shareholder_id' => $sh->id ?? null,
-                    'email'          => $sh->email,
-                    'error'          => $e->getMessage(),
-                ]);
+            // A. Kirim Email jika saluran mengizinkan
+            if ($shouldSendEmail && !empty($sh->email)) {
+                try {
+                    Mail::to($sh->email)->send(new DailyFinancialReportMail($sh, $dailyData, $personalProfit));
+                    $sentEmailCount++;
+                    $this->info("   [OK-EMAIL] Email berhasil dikirim ke {$sh->email}");
+                } catch (\Throwable $e) {
+                    $failedEmailCount++;
+                    $this->error("   [GAGAL-EMAIL] Gagal mengirim ke {$sh->email}: " . $e->getMessage());
+                    Log::error("Cron Daily Report: Gagal kirim email", [
+                        'shareholder_id' => $sh->id ?? null,
+                        'email'          => $sh->email,
+                        'error'          => $e->getMessage(),
+                    ]);
+                }
+            }
+
+            // B. Kirim WhatsApp jika saluran mengizinkan
+            if ($shouldSendWa && !empty($sh->phone) && $fonnteService) {
+                try {
+                    $waMessage = "*📊 LAPORAN KEUANGAN HARIAN - {$appName}*\n"
+                        . "📅 *Tanggal:* {$formattedDate}\n\n"
+                        . "Halo *{$sh->name}*,\n"
+                        . "Berikut ringkasan kinerja keuangan hari ini:\n\n"
+                        . "💰 *Uang Masuk:* Rp " . number_format($totalInflow, 0, ',', '.') . "\n"
+                        . "💸 *Uang Keluar:* Rp " . number_format($totalOutflow, 0, ',', '.') . "\n"
+                        . "📈 *Laba Bersih:* Rp " . number_format($netProfit, 0, ',', '.') . "\n"
+                        . "📊 *Margin:* " . number_format($marginPct, 1) . "%\n"
+                        . "------------------------------------\n"
+                        . "🏷️ *Porsi Saham Anda:* {$percentage}%\n"
+                        . "💵 *Estimasi Porsi Laba:* Rp " . number_format($personalProfit, 0, ',', '.') . "\n\n"
+                        . "Detail lengkap dapat diakses melalui portal investor.\nTerima kasih!";
+
+                    $res = $fonnteService->sendMessage($sh->phone, $waMessage);
+                    if ($res['success'] ?? false) {
+                        $sentWaCount++;
+                        $this->info("   [OK-WA] WhatsApp berhasil dikirim ke {$sh->phone}");
+                    } else {
+                        $failedWaCount++;
+                        $this->warn("   [GAGAL-WA] Gagal kirim WA ke {$sh->phone}: " . ($res['message'] ?? 'Unknown error'));
+                    }
+                } catch (\Throwable $e) {
+                    $failedWaCount++;
+                    $this->error("   [GAGAL-WA] Gagal kirim WA ke {$sh->phone}: " . $e->getMessage());
+                    Log::error("Cron Daily Report: Gagal kirim WA", [
+                        'shareholder_id' => $sh->id ?? null,
+                        'phone'          => $sh->phone,
+                        'error'          => $e->getMessage(),
+                    ]);
+                }
             }
         }
 
         $this->info("==========================================================");
         if ($isDryRun) {
             $this->info(" SIMULASI SELESAI: Laporan berhasil disimulasikan (--dry-run).");
-            $this->comment(" (Catatan: Tidak ada email fisik yang dikirim keluar saat mode simulasi aktif)");
+            $this->comment(" (Catatan: Tidak ada notifikasi fisik yang dikirim keluar saat mode simulasi aktif)");
         } else {
-            $this->info(" PENGIRIMAN SELESAI: {$sentCount} Berhasil | {$failedCount} Gagal");
-            if ($failedCount > 0) {
-                $this->warn(" Catatan: Email yang gagal disebabkan oleh alamat email tujuan tidak terdaftar/aktif di server mail.");
+            $this->info(" PENGIRIMAN SELESAI:");
+            if ($shouldSendEmail) {
+                $this->info(" -> Email:    {$sentEmailCount} Berhasil | {$failedEmailCount} Gagal");
+            }
+            if ($shouldSendWa) {
+                $this->info(" -> WhatsApp: {$sentWaCount} Berhasil | {$failedWaCount} Gagal");
             }
         }
         $this->info("==========================================================");
 
         Log::info("Cron Daily Report Selesai", [
-            'date'   => $targetDate,
-            'sent'   => $sentCount,
-            'failed' => $failedCount,
+            'date'       => $targetDate,
+            'channel'    => $channel,
+            'sent_email' => $sentEmailCount,
+            'sent_wa'    => $sentWaCount,
         ]);
 
-        return ($sentCount > 0 || $isDryRun) ? Command::SUCCESS : Command::FAILURE;
+        return Command::SUCCESS;
     }
 }

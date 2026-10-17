@@ -23,6 +23,28 @@ class AssetImage extends Model
         'is_primary' => 'boolean',
     ];
 
+    protected $appends = [
+        'url',
+        'is_pdf',
+        'file_name',
+    ];
+
+    /**
+     * Apakah berkas ini merupakan dokumen PDF.
+     */
+    public function getIsPdfAttribute(): bool
+    {
+        return str_ends_with(strtolower($this->image_path ?? ''), '.pdf');
+    }
+
+    /**
+     * Nama berkas asli/tersimpan.
+     */
+    public function getFileNameAttribute(): string
+    {
+        return basename($this->image_path ?? '');
+    }
+
     /**
      * Relasi ke Asset pemilik gambar.
      */

@@ -285,18 +285,18 @@
                             <input type="text" name="mac_address" class="form-control font-monospace" placeholder="Contoh: 00:1B:44:11:3A:B7">
                         </div>
 
-                        <!-- UPLOAD MULTIPLE FOTO ASET -->
+                        <!-- UPLOAD MULTIPLE FOTO & DOKUMEN ASET -->
                         <div class="col-12">
                             <label class="form-label fw-bold text-dark mb-1 d-flex justify-content-between align-items-center">
                                 <span class="d-flex align-items-center gap-1.5">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon text-primary"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 8h.01" /><path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z" /><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5" /><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3" /></svg>
-                                    <span>Foto / Dokumentasi Fisik Aset</span>
+                                    <span>Foto / Dokumentasi Fisik & Berkas Aset</span>
                                 </span>
-                                <span class="badge bg-light text-muted small">Bisa pilih lebih dari 1 foto (Maks. 5MB)</span>
+                                <span class="badge bg-light text-muted small">Bisa foto & dokumen PDF (Maks. 10MB)</span>
                             </label>
-                            <input type="file" name="images[]" id="add_asset_images" class="form-control" accept="image/jpeg,image/png,image/webp,image/jpg" multiple>
-                            <div class="form-text text-muted small mt-1">Pilih satu atau beberapa file foto (JPG, PNG, WEBP). Foto pertama akan menjadi foto sampul.</div>
-                            <!-- Live Preview Multiple Images -->
+                            <input type="file" name="images[]" id="add_asset_images" class="form-control" accept="image/jpeg,image/png,image/webp,image/jpg,application/pdf" multiple>
+                            <div class="form-text text-muted small mt-1">Pilih berkas foto (JPG, PNG, WEBP) atau dokumen PDF (Faktur, Kwitansi, Manual, dll). Berkas pertama akan menjadi berkas sampul.</div>
+                            <!-- Live Preview Multiple Files -->
                             <div id="add_images_preview" class="d-flex flex-wrap gap-2 mt-2"></div>
                         </div>
 
@@ -438,26 +438,26 @@
                             <input type="text" name="mac_address" id="edit_mac_address" class="form-control font-monospace">
                         </div>
 
-                        <!-- KELOLA FOTO ASET DI EDIT MODAL -->
+                        <!-- KELOLA FOTO & DOKUMEN ASET DI EDIT MODAL -->
                         <div class="col-12">
                             <label class="form-label fw-bold text-dark mb-1 d-flex justify-content-between align-items-center">
                                 <span class="d-flex align-items-center gap-1.5">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon text-primary"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 8h.01" /><path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z" /><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5" /><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3" /></svg>
-                                    <span>Kelola Foto / Gambar Aset</span>
+                                    <span>Kelola Foto & Dokumen Aset</span>
                                 </span>
-                                <span class="badge bg-light text-muted small">Maks. 5MB / foto</span>
+                                <span class="badge bg-light text-muted small">Maks. 10MB / berkas (Foto atau PDF)</span>
                             </label>
 
-                            <!-- Foto Saat Ini -->
+                            <!-- Berkas Saat Ini -->
                             <div id="edit_existing_images_wrap" class="p-3 bg-light-subtle rounded-3 border mb-2 d-none">
-                                <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size: 0.7rem;">Foto Tersimpan (Klik ikon silang untuk menghapus):</div>
+                                <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size: 0.7rem;">Berkas Tersimpan (Klik ikon silang untuk menghapus):</div>
                                 <div id="edit_existing_images" class="d-flex flex-wrap gap-2.5"></div>
                             </div>
                             <input type="hidden" name="deleted_image_ids" id="edit_deleted_image_ids" value="">
 
-                            <!-- Upload Tambahan Foto Baru -->
-                            <input type="file" name="images[]" id="edit_asset_images" class="form-control" accept="image/jpeg,image/png,image/webp,image/jpg" multiple>
-                            <div class="form-text text-muted small mt-1">Pilih foto tambahan untuk diunggah ke aset ini.</div>
+                            <!-- Upload Tambahan Foto / Dokumen Baru -->
+                            <input type="file" name="images[]" id="edit_asset_images" class="form-control" accept="image/jpeg,image/png,image/webp,image/jpg,application/pdf" multiple>
+                            <div class="form-text text-muted small mt-1">Pilih berkas foto atau dokumen PDF tambahan untuk diunggah ke aset ini.</div>
                             <div id="edit_images_preview" class="d-flex flex-wrap gap-2 mt-2"></div>
                         </div>
 
@@ -566,7 +566,7 @@
     </div>
 </div>
 
-<!-- ================= MODAL GALERI SEMUA FOTO ASET ================= -->
+<!-- ================= MODAL GALERI SEMUA FOTO & DOKUMEN ASET ================= -->
 <div class="modal fade" id="modalAssetGallery" tabindex="-1" aria-labelledby="modalAssetGalleryLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden;">
@@ -577,10 +577,10 @@
                     </div>
                     <div>
                         <div class="d-flex align-items-center gap-2">
-                            <h4 class="modal-title fw-bold text-dark mb-0 fs-3" id="galleryModalTitle">Galeri Foto Aset</h4>
-                            <span class="badge bg-purple text-white font-monospace" id="galleryModalBadge">0 Foto</span>
+                            <h4 class="modal-title fw-bold text-dark mb-0 fs-3" id="galleryModalTitle">Galeri Foto & Dokumen Aset</h4>
+                            <span class="badge bg-purple text-white font-monospace" id="galleryModalBadge">0 Berkas</span>
                         </div>
-                        <p class="text-muted small mb-0 mt-0.5" style="font-size: 0.78rem;">Dokumentasi foto fisik inventaris aset. Klik foto untuk memperbesar tampilan.</p>
+                        <p class="text-muted small mb-0 mt-0.5" style="font-size: 0.78rem;">Dokumentasi foto fisik dan berkas PDF inventaris aset. Klik foto untuk memperbesar atau klik tombol untuk membuka dokumen.</p>
                     </div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -588,12 +588,12 @@
             <div class="modal-body p-4 bg-light" id="galleryModalContent" style="min-height: 250px;">
                 <div class="text-center py-5">
                     <div class="spinner-border text-primary" role="status"></div>
-                    <div class="text-muted small mt-2">Memuat galeri foto...</div>
+                    <div class="text-muted small mt-2">Memuat galeri berkas...</div>
                 </div>
             </div>
             <div class="modal-footer bg-white py-2.5 px-4 d-flex justify-content-between align-items-center">
                 <div class="text-muted small" style="font-size: 0.75rem;">
-                    💡 Tips: Klik kartu foto untuk melihat ukuran penuh di lightbox.
+                    💡 Tips: Klik kartu foto untuk melihat ukuran penuh, atau klik berkas PDF untuk membuka/mengunduh dokumen.
                 </div>
                 <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Tutup</button>
             </div>
@@ -634,45 +634,88 @@ $(document).ready(function () {
         }
     });
 
-    // 2. Client-side Multiple Image Preview (Add Modal)
+    function formatBytes(bytes) {
+        if (!bytes || bytes === 0) return '0 B';
+        var k = 1024;
+        var sizes = ['B', 'KB', 'MB', 'GB'];
+        var i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    function isPdfFile(filename, mimeType) {
+        if (mimeType && mimeType.toLowerCase().includes('pdf')) return true;
+        if (filename && filename.toLowerCase().endsWith('.pdf')) return true;
+        return false;
+    }
+
+    // 2. Client-side Multiple File Preview (Add Modal)
     $('#add_asset_images').on('change', function () {
         var previewWrap = $('#add_images_preview');
         previewWrap.empty();
         if (this.files && this.files.length > 0) {
             Array.from(this.files).forEach(function (file, index) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    var primaryBadge = index === 0 ? '<span class="badge bg-primary position-absolute bottom-0 start-0 m-1 font-monospace" style="font-size: 0.6rem;">Utama</span>' : '';
+                var isPrimary = index === 0;
+                var primaryBadge = isPrimary ? '<span class="badge bg-primary position-absolute bottom-0 start-0 m-1 font-monospace" style="font-size: 0.6rem; z-index: 2;">Utama</span>' : '';
+
+                if (isPdfFile(file.name, file.type)) {
                     var card = $(`
-                        <div class="position-relative border rounded-2 p-1 bg-white shadow-2xs" style="width: 78px; height: 78px;">
-                            <img src="${e.target.result}" class="rounded-1 w-100 h-100" style="object-fit: cover;">
+                        <div class="position-relative border rounded-2 p-1.5 bg-white shadow-2xs d-flex flex-column align-items-center justify-content-center text-center" style="width: 86px; height: 86px;" title="${file.name} (${formatBytes(file.size)})">
+                            <span class="badge bg-danger-lt px-1.5 py-0.5 mb-1 fw-bold font-monospace" style="font-size: 0.65rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-0.5"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M10 12h2a2 2 0 1 0 0 -4h-2v8m4 0h3" /></svg>PDF
+                            </span>
+                            <div class="text-truncate w-100 fw-semibold text-dark" style="font-size: 0.65rem; line-height: 1.1;">${file.name}</div>
+                            <div class="text-muted font-monospace mt-0.5" style="font-size: 0.58rem;">${formatBytes(file.size)}</div>
                             ${primaryBadge}
                         </div>
                     `);
                     previewWrap.append(card);
-                };
-                reader.readAsDataURL(file);
+                } else {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var card = $(`
+                            <div class="position-relative border rounded-2 p-1 bg-white shadow-2xs" style="width: 86px; height: 86px;" title="${file.name}">
+                                <img src="${e.target.result}" class="rounded-1 w-100 h-100" style="object-fit: cover;">
+                                ${primaryBadge}
+                            </div>
+                        `);
+                        previewWrap.append(card);
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
     });
 
-    // Client-side Multiple Image Preview (Edit Modal)
+    // Client-side Multiple File Preview (Edit Modal)
     $('#edit_asset_images').on('change', function () {
         var previewWrap = $('#edit_images_preview');
         previewWrap.empty();
         if (this.files && this.files.length > 0) {
             Array.from(this.files).forEach(function (file) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
+                if (isPdfFile(file.name, file.type)) {
                     var card = $(`
-                        <div class="position-relative border rounded-2 p-1 bg-white shadow-2xs" style="width: 78px; height: 78px;">
-                            <img src="${e.target.result}" class="rounded-1 w-100 h-100" style="object-fit: cover;">
+                        <div class="position-relative border rounded-2 p-1.5 bg-white shadow-2xs d-flex flex-column align-items-center justify-content-center text-center" style="width: 86px; height: 86px;" title="${file.name} (${formatBytes(file.size)})">
+                            <span class="badge bg-danger-lt px-1.5 py-0.5 mb-1 fw-bold font-monospace" style="font-size: 0.65rem;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-0.5"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M10 12h2a2 2 0 1 0 0 -4h-2v8m4 0h3" /></svg>PDF
+                            </span>
+                            <div class="text-truncate w-100 fw-semibold text-dark" style="font-size: 0.65rem; line-height: 1.1;">${file.name}</div>
                             <span class="badge bg-success position-absolute bottom-0 start-0 m-1 font-monospace" style="font-size: 0.6rem;">Baru</span>
                         </div>
                     `);
                     previewWrap.append(card);
-                };
-                reader.readAsDataURL(file);
+                } else {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var card = $(`
+                            <div class="position-relative border rounded-2 p-1 bg-white shadow-2xs" style="width: 86px; height: 86px;" title="${file.name}">
+                                <img src="${e.target.result}" class="rounded-1 w-100 h-100" style="object-fit: cover;">
+                                <span class="badge bg-success position-absolute bottom-0 start-0 m-1 font-monospace" style="font-size: 0.6rem;">Baru</span>
+                            </div>
+                        `);
+                        previewWrap.append(card);
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
     });
@@ -805,11 +848,11 @@ $(document).ready(function () {
         }, 300);
     });
 
-    // 6. View All Asset Photos in Gallery Modal
+    // 6. View All Asset Photos & Documents in Gallery Modal
     $(document).on('click', '.btn-view-gallery', function () {
         var id = $(this).data('id');
         $('#modalAssetGallery').modal('show');
-        $('#galleryModalContent').html('<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><div class="text-muted small mt-2">Memuat galeri foto...</div></div>');
+        $('#galleryModalContent').html('<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><div class="text-muted small mt-2">Memuat berkas dokumentasi...</div></div>');
 
         $.ajax({
             url: "{{ url('assets') }}/" + id,
@@ -818,36 +861,64 @@ $(document).ready(function () {
             success: function (res) {
                 if (res.status === 'success') {
                     var d = res.data;
-                    $('#galleryModalTitle').text('Galeri Foto: ' + d.name);
+                    $('#galleryModalTitle').text('Galeri Foto & Dokumen: ' + d.name);
                     var count = d.images ? d.images.length : 0;
-                    $('#galleryModalBadge').text(count + ' Foto');
+                    $('#galleryModalBadge').text(count + ' Berkas');
 
                     if (d.images && d.images.length > 0) {
                         var gridHtml = '<div class="row g-3">';
                         d.images.forEach(function (img, idx) {
-                            var isPrimBadge = img.is_primary ? '<span class="badge bg-primary position-absolute top-0 start-0 m-2 shadow-sm font-monospace" style="font-size: 0.65rem;">Sampul Utama</span>' : '';
-                            gridHtml += `
-                                <div class="col-6 col-md-4 col-lg-3">
-                                    <div class="gallery-card border bg-white position-relative shadow-2xs h-100 d-flex flex-column">
-                                        <div class="position-relative overflow-hidden cursor-pointer btn-preview-photo" data-img="${img.url}" data-name="${d.name} (Foto ${idx + 1})" style="height: 155px; background-color: #0f172a;" title="Klik untuk memperbesar">
-                                            <img src="${img.url}" class="w-100 h-100" style="object-fit: cover; transition: transform 0.25s ease;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
-                                            ${isPrimBadge}
-                                            <div class="position-absolute bottom-0 end-0 m-1 bg-dark bg-opacity-75 text-white rounded px-1.5 py-0.5 font-monospace" style="font-size: 0.65rem;">
-                                                #${idx + 1}
+                            var isPrimBadge = img.is_primary ? '<span class="badge bg-primary position-absolute top-0 start-0 m-2 shadow-sm font-monospace" style="font-size: 0.65rem; z-index: 2;">Sampul Utama</span>' : '';
+
+                            if (img.is_pdf) {
+                                var fileName = img.file_name || ('Dokumen_' + (idx + 1) + '.pdf');
+                                gridHtml += `
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <div class="gallery-card border bg-white position-relative shadow-2xs h-100 d-flex flex-column">
+                                            <div class="p-3 d-flex flex-column align-items-center justify-content-center text-center position-relative flex-grow-1" style="min-height: 155px; background: linear-gradient(135deg, #fff5f5 0%, #fee2e2 100%);">
+                                                ${isPrimBadge}
+                                                <div class="avatar bg-danger text-white rounded-circle mb-2 shadow-sm" style="width: 48px; height: 48px;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M10 12h2a2 2 0 1 0 0 -4h-2v8m4 0h3" /></svg>
+                                                </div>
+                                                <div class="badge bg-danger text-white font-monospace mb-1" style="font-size: 0.65rem;">DOKUMEN PDF</div>
+                                                <div class="small fw-bold text-dark text-truncate w-100 px-1" title="${fileName}">${fileName}</div>
+                                                <div class="position-absolute bottom-0 end-0 m-1 bg-dark bg-opacity-75 text-white rounded px-1.5 py-0.5 font-monospace" style="font-size: 0.65rem;">
+                                                    #${idx + 1}
+                                                </div>
+                                            </div>
+                                            <div class="p-2 border-top bg-light d-flex justify-content-between align-items-center">
+                                                <a href="${img.url}" target="_blank" class="btn btn-outline-danger btn-xs w-100 d-flex align-items-center justify-content-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" /><path d="M11 13l9 -9" /><path d="M15 4h5v5" /></svg>
+                                                    Buka PDF
+                                                </a>
                                             </div>
                                         </div>
-                                        <div class="p-2 border-top bg-light d-flex justify-content-between align-items-center">
-                                            <button type="button" class="btn btn-ghost-primary btn-xs btn-preview-photo" data-img="${img.url}" data-name="${d.name} (Foto ${idx + 1})">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /><path d="M10 7v6" /><path d="M7 10h6" /></svg>
-                                                Perbesar
-                                            </button>
-                                            <a href="${img.url}" target="_blank" class="btn btn-ghost-secondary btn-xs" title="Buka foto di tab baru">
-                                                ↗
-                                            </a>
+                                    </div>
+                                `;
+                            } else {
+                                gridHtml += `
+                                    <div class="col-6 col-md-4 col-lg-3">
+                                        <div class="gallery-card border bg-white position-relative shadow-2xs h-100 d-flex flex-column">
+                                            <div class="position-relative overflow-hidden cursor-pointer btn-preview-photo" data-img="${img.url}" data-name="${d.name} (Foto ${idx + 1})" style="height: 155px; background-color: #0f172a;" title="Klik untuk memperbesar">
+                                                <img src="${img.url}" class="w-100 h-100" style="object-fit: cover; transition: transform 0.25s ease;" onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                                                ${isPrimBadge}
+                                                <div class="position-absolute bottom-0 end-0 m-1 bg-dark bg-opacity-75 text-white rounded px-1.5 py-0.5 font-monospace" style="font-size: 0.65rem;">
+                                                    #${idx + 1}
+                                                </div>
+                                            </div>
+                                            <div class="p-2 border-top bg-light d-flex justify-content-between align-items-center">
+                                                <button type="button" class="btn btn-ghost-primary btn-xs btn-preview-photo" data-img="${img.url}" data-name="${d.name} (Foto ${idx + 1})">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /><path d="M10 7v6" /><path d="M7 10h6" /></svg>
+                                                    Perbesar
+                                                </button>
+                                                <a href="${img.url}" target="_blank" class="btn btn-ghost-secondary btn-xs" title="Buka foto di tab baru">
+                                                    ↗
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            `;
+                                `;
+                            }
                         });
                         gridHtml += '</div>';
                         $('#galleryModalContent').html(gridHtml);
@@ -857,8 +928,8 @@ $(document).ready(function () {
                                 <div class="avatar bg-light text-muted rounded-circle mb-2" style="width: 50px; height: 50px;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 8h.01" /><path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z" /><path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5" /><path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3" /></svg>
                                 </div>
-                                <h4 class="text-dark fw-bold mb-1">Belum Ada Foto</h4>
-                                <p class="text-muted small mb-0">Aset ini belum memiliki foto yang diunggah.</p>
+                                <h4 class="text-dark fw-bold mb-1">Belum Ada Foto atau Dokumen</h4>
+                                <p class="text-muted small mb-0">Aset ini belum memiliki foto atau berkas PDF yang diunggah.</p>
                             </div>
                         `);
                     }
@@ -921,18 +992,32 @@ $(document).ready(function () {
                         ? '<span class="badge bg-purple-lt fw-bold font-monospace fs-4 px-2.5 py-1">Investor: ' + (d.shareholder_name || d.owner_label) + '</span>'
                         : '<span class="badge bg-blue-lt fw-bold font-monospace fs-4 px-2.5 py-1">PT CIO NETWORK SOLUTION</span>';
 
-                    // Gallery HTML
+                    // Gallery & Documents HTML
                     var galleryHtml = '';
                     if (d.images && d.images.length > 0) {
-                        galleryHtml = '<div class="col-12"><div class="border p-3 rounded-2 bg-white"><div class="text-muted small fw-bold text-uppercase mb-2" style="font-size: 0.7rem;">Galeri Foto Aset (' + d.images.length + ' Foto)</div><div class="d-flex flex-wrap gap-2.5">';
+                        galleryHtml = '<div class="col-12"><div class="border p-3 rounded-2 bg-white"><div class="text-muted small fw-bold text-uppercase mb-2" style="font-size: 0.7rem;">Foto & Dokumen Aset (' + d.images.length + ' Berkas)</div><div class="d-flex flex-wrap gap-2.5">';
                         d.images.forEach(function (img, idx) {
-                            var isPrim = img.is_primary ? '<span class="badge bg-primary position-absolute bottom-0 start-0 m-1 font-monospace" style="font-size: 0.55rem;">Sampul</span>' : '';
-                            galleryHtml += `
-                                <div class="position-relative border rounded-2 p-1 bg-white cursor-pointer btn-preview-photo shadow-2xs" data-img="${img.url}" data-name="${d.name} (${idx+1})" style="width: 86px; height: 86px;" title="Klik untuk memperbesar">
-                                    <img src="${img.url}" class="rounded-1 w-100 h-100" style="object-fit: cover;">
-                                    ${isPrim}
-                                </div>
-                            `;
+                            var isPrim = img.is_primary ? '<span class="badge bg-primary position-absolute bottom-0 start-0 m-1 font-monospace" style="font-size: 0.55rem; z-index: 2;">Sampul</span>' : '';
+                            if (img.is_pdf) {
+                                var fileName = img.file_name || ('PDF ' + (idx + 1));
+                                galleryHtml += `
+                                    <a href="${img.url}" target="_blank" class="position-relative border rounded-2 p-1.5 bg-light-subtle shadow-2xs d-flex flex-column align-items-center justify-content-center text-center text-decoration-none" style="width: 86px; height: 86px;" title="Klik untuk membuka dokumen PDF (${fileName})">
+                                        <span class="badge bg-danger-lt px-1.5 py-0.5 mb-1 font-monospace fw-bold" style="font-size: 0.65rem;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-0.5"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14 3v4a1 1 0 0 0 1 1h4" /><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" /><path d="M10 12h2a2 2 0 1 0 0 -4h-2v8m4 0h3" /></svg>PDF
+                                        </span>
+                                        <div class="text-truncate w-100 fw-bold text-dark" style="font-size: 0.65rem; line-height: 1.1;">${fileName}</div>
+                                        <span class="text-primary mt-1" style="font-size: 0.6rem;">Buka ↗</span>
+                                        ${isPrim}
+                                    </a>
+                                `;
+                            } else {
+                                galleryHtml += `
+                                    <div class="position-relative border rounded-2 p-1 bg-white cursor-pointer btn-preview-photo shadow-2xs" data-img="${img.url}" data-name="${d.name} (${idx+1})" style="width: 86px; height: 86px;" title="Klik untuk memperbesar">
+                                        <img src="${img.url}" class="rounded-1 w-100 h-100" style="object-fit: cover;">
+                                        ${isPrim}
+                                    </div>
+                                `;
+                            }
                         });
                         galleryHtml += '</div></div></div>';
                     }
@@ -1031,16 +1116,30 @@ $(document).ready(function () {
                     $('#edit_mac_address').val(d.mac_address);
                     $('#edit_notes').val(d.notes);
 
-                    // Existing Images in Edit Modal
+                    // Existing Images / Files in Edit Modal
                     var existingWrap = $('#edit_existing_images');
                     existingWrap.empty();
                     if (d.images && d.images.length > 0) {
                         $('#edit_existing_images_wrap').removeClass('d-none');
                         d.images.forEach(function (img) {
+                            var innerContent = '';
+                            if (img.is_pdf) {
+                                var fileName = img.file_name || 'Dokumen.pdf';
+                                innerContent = `
+                                    <a href="${img.url}" target="_blank" class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-center text-decoration-none p-1 bg-light rounded-1" title="Lihat berkas PDF">
+                                        <span class="badge bg-danger-lt px-1.5 py-0.5 mb-1 font-monospace fw-bold" style="font-size: 0.65rem;">PDF</span>
+                                        <div class="text-truncate w-100 small fw-bold text-dark" style="font-size: 0.65rem;">${fileName}</div>
+                                        <span class="text-primary small" style="font-size: 0.6rem;">Buka ↗</span>
+                                    </a>
+                                `;
+                            } else {
+                                innerContent = `<img src="${img.url}" class="rounded-1 w-100 h-100" style="object-fit: cover;">`;
+                            }
+
                             var item = $(`
-                                <div class="position-relative border rounded-2 p-1 bg-white shadow-2xs existing-img-item" id="existing_img_${img.id}" style="width: 78px; height: 78px;">
-                                    <img src="${img.url}" class="rounded-1 w-100 h-100" style="object-fit: cover;">
-                                    <button type="button" class="btn btn-danger btn-sm p-0 position-absolute top-0 end-0 rounded-circle btn-remove-existing-img" data-id="${img.id}" title="Hapus foto ini" style="width: 20px; height: 20px; transform: translate(30%, -30%); line-height: 1;">
+                                <div class="position-relative border rounded-2 p-1 bg-white shadow-2xs existing-img-item" id="existing_img_${img.id}" style="width: 82px; height: 82px;">
+                                    ${innerContent}
+                                    <button type="button" class="btn btn-danger btn-sm p-0 position-absolute top-0 end-0 rounded-circle btn-remove-existing-img" data-id="${img.id}" title="Hapus berkas ini" style="width: 20px; height: 20px; transform: translate(30%, -30%); line-height: 1; z-index: 3;">
                                         &times;
                                     </button>
                                 </div>
